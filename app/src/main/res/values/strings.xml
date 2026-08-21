@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Mic Mini Recorder</string>
+    <string name="notification_channel_name">Mic Mini 录音</string>
+    <string name="notification_title">Mic Mini 录音</string>
+</resources>
