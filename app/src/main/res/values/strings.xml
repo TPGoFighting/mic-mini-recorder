@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TP Recorder</string>
+    <string name="notification_channel_name">TP Recorder 录音服务</string>
+    <string name="notification_channel_desc">用于保持后台持续录音和状态通知</string>
+    <string name="notification_title">TP Recorder 录音中</string>
+    <string name="action_stop">停止录音</string>
+</resources>

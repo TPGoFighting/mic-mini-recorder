@@ -1,0 +1,7 @@
+{
+  "name": "TP Recorder",
+  "description": "专为 DJI Mic Mini 及蓝牙麦克风设计的高品质分段录音工具，支持 MP3/AAC 编码、音频路由切换、实时波形与分段管理",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

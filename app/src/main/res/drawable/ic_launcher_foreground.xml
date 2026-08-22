@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:pivotX="54"
+        android:pivotY="54">
+        
+        <!-- Soft Shadow Behind TP Monogram -->
+        <path
+            android:fillColor="#1A7556EA"
+            android:pathData="M32,32 h44 c3.3,0 6,2.7 6,6 v2 c0,3.3 -2.7,6 -6,6 h-14 v28 c0,3.3 -2.7,6 -6,6 h-4 c-3.3,0 -6,-2.7 -6,-6 v-28 h-14 c-3.3,0 -6,-2.7 -6,-6 v-2 c0,-3.3 2.7,-6 6,-6 z" />
+
+        <!-- T Top Bar & Stem Gradient -->
+        <path
+            android:pathData="M30,30 h46 c3.3,0 6,2.7 6,6 c0,3.3 -2.7,6 -6,6 h-15 v28 c0,3.3 -2.7,6 -6,6 h-4 c-3.3,0 -6,-2.7 -6,-6 v-28 h-15 c-3.3,0 -6,-2.7 -6,-6 c0,-3.3 2.7,-6 6,-6 z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="24"
+                    android:startY="30"
+                    android:endX="82"
+                    android:endY="76"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#9D82F7" />
+                    <item android:offset="1.0" android:color="#7556EA" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- P Loop Ribbon Gradient -->
+        <path
+            android:pathData="M52,36 h14 c8.8,0 16,7.2 16,16 c0,8.8 -7.2,16 -16,16 h-14 v-32 z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="52"
+                    android:startY="36"
+                    android:endX="82"
+                    android:endY="68"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#B59FFC" />
+                    <item android:offset="1.0" android:color="#7756EA" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- P Inner Void Cutout -->
+        <path
+            android:fillColor="#F4F5FB"
+            android:pathData="M58,42 h8 c5.5,0 10,4.5 10,10 c0,5.5 -4.5,10 -10,10 h-8 v-20 z" />
+
+        <!-- Audio Waveform Bars Inside P Loop -->
+        <!-- Bar 1 -->
+        <path
+            android:fillColor="#8B6EF5"
+            android:pathData="M61,50 h2 v4 h-2 z" />
+        <!-- Bar 2 -->
+        <path
+            android:fillColor="#7556EA"
+            android:pathData="M64,47 h2 v10 h-2 z" />
+        <!-- Bar 3 (Center Tall) -->
+        <path
+            android:fillColor="#6B46E5"
+            android:pathData="M67,45 h2 v14 h-2 z" />
+        <!-- Bar 4 -->
+        <path
+            android:fillColor="#7556EA"
+            android:pathData="M70,47 h2 v10 h-2 z" />
+        <!-- Bar 5 -->
+        <path
+            android:fillColor="#8B6EF5"
+            android:pathData="M73,50 h2 v4 h-2 z" />
+
+    </group>
+</vector>
