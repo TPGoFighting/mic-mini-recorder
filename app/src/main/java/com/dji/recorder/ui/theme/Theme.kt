@@ -1,8 +1,13 @@
 package com.dji.recorder.ui.theme
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,14 +20,18 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,16 +55,12 @@ val NeoOrange = Color(0xFFFF7A00)      // 活力亮橙
 // Light 模式背景与底色（复古暖米白纸张感）
 val NeoBgLight = Color(0xFFF7F4EC)
 val NeoSurfaceLight = Color(0xFFFFFFFF)
-val NeoBorderLight = Color(0xFF000000)
-val NeoShadowLight = Color(0xFF000000)
 
 // Dark 模式背景与底色（深邃极客哑光黑）
 val NeoBgDark = Color(0xFF101216)
 val NeoSurfaceDark = Color(0xFF1B1E24)
-val NeoBorderDark = Color(0xFFFFFFFF)
-val NeoShadowDark = Color(0xFFCCFF00) // 暗黑模式下投射酸性绿或高对比硬阴影
 
-// 兼容老引用
+// 兼容引用
 val DjiGreen = NeoAcidLime
 val DjiYellow = NeoCyberYellow
 val DjiRed = NeoHotRed
@@ -121,18 +126,18 @@ fun DjiRecorderTheme(
 }
 
 // ==========================================
-// 🧱 Neo-Brutalism 原生 Compose 风格化组件
+// 🧱 Neo-Brutalism 交互式动效组件
 // ==========================================
 
 /**
- * 新粗野风格核心硬阴影卡片 (带 2.5dp 黑色硬边框与实体无模糊阴影)
+ * 带有【物理按压回弹机械动效】的新粗野核心卡片
  */
 @Composable
 fun NeoCard(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     borderColor: Color = MaterialTheme.colorScheme.outline,
-    shadowColor: Color = if (isSystemInDarkTheme()) Color(0xFF000000) else Color(0xFF000000),
+    shadowColor: Color = Color(0xFF000000),
     borderWidth: Dp = 2.5.dp,
     shadowOffset: Dp = 4.dp,
     shape: Shape = RoundedCornerShape(14.dp),
@@ -140,6 +145,16 @@ fun NeoCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // 机械下沉按压动效
+    val animTranslate by animateDpAsState(
+        targetValue = if (isPressed && onClick != null) 2.5.dp else 0.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "cardTranslate"
+    )
+
     Box(modifier = modifier) {
         // 底层实体硬阴影
         Box(
@@ -150,14 +165,22 @@ fun NeoCard(
                 .background(shadowColor)
                 .border(borderWidth, shadowColor, shape)
         )
-        // 表层卡片
+        // 表层卡片（按压时向右下物理下陷）
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .offset(x = animTranslate, y = animTranslate)
                 .clip(shape)
                 .background(backgroundColor)
                 .border(borderWidth, borderColor, shape)
-                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) { onClick() }
+                    } else Modifier
+                )
                 .padding(padding),
             content = content
         )
@@ -165,7 +188,7 @@ fun NeoCard(
 }
 
 /**
- * 新粗野风格实体按压按键
+ * 带有【街机微动开关按压下陷动效】的新粗野按键
  */
 @Composable
 fun NeoButton(
@@ -178,6 +201,15 @@ fun NeoButton(
     shape: Shape = RoundedCornerShape(14.dp),
     content: @Composable RowScope.() -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val animTranslate by animateDpAsState(
+        targetValue = if (isPressed) 3.dp else 0.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "btnTranslate"
+    )
+
     Box(modifier = modifier) {
         // 阴影层
         Box(
@@ -188,14 +220,18 @@ fun NeoButton(
                 .background(shadowColor)
                 .border(2.5.dp, shadowColor, shape)
         )
-        // 按钮本体
+        // 按钮本体 (按压时下陷)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .offset(x = animTranslate, y = animTranslate)
                 .clip(shape)
                 .background(backgroundColor)
                 .border(2.5.dp, borderColor, shape)
-                .clickable { onClick() }
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { onClick() }
                 .padding(vertical = 14.dp, horizontal = 20.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
@@ -205,7 +241,7 @@ fun NeoButton(
 }
 
 /**
- * 新粗野风格工业标签 Badge (黑边框 + 实体底色)
+ * 新粗野风格互动标签 Badge (支持轻触触感)
  */
 @Composable
 fun NeoBadge(
@@ -218,18 +254,34 @@ fun NeoBadge(
     shape: Shape = RoundedCornerShape(6.dp),
     onClick: (() -> Unit)? = null
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val animScale by animateDpAsState(
+        targetValue = if (isPressed && onClick != null) 1.5.dp else 0.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "badgeScale"
+    )
+
     Box(
         modifier = modifier
+            .offset(x = animScale, y = animScale)
             .clip(shape)
             .background(backgroundColor)
             .border(borderWidth, borderColor, shape)
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { onClick() }
+                } else Modifier
+            )
             .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                fontWeight = FontWeight.Black,
                 letterSpacing = 0.5.sp
             ),
             color = textColor

@@ -3,11 +3,28 @@ package com.dji.recorder.ui
 import android.Manifest
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,14 +40,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
@@ -39,11 +53,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +67,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -167,7 +180,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
                     .padding(horizontal = 18.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 顶栏（Neo-Brutalism 粗野风格 Header）
+                // 顶栏
                 TopHeaderBar(
                     themeMode = themeMode,
                     onToggleTheme = { viewModel.toggleTheme() },
@@ -189,7 +202,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // 录音计时器与转码/AI处理进度（复古工业液晶面板）
+                // 录音计时器与转码/AI处理进度（带呼吸红光晕圈动效）
                 TimerDisplay(
                     durationMs = durationMs,
                     status = status,
@@ -207,7 +220,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // 录音历史列表
+                // 录音历史列表 (带动态跳动音轨动画)
                 RecordingsListSection(
                     recordings = recordings,
                     isPlaying = isPlaying,
@@ -221,7 +234,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // 底部操作栏
+                // 底部操作栏（带机械下沉按压动效）
                 BottomControlBar(
                     status = status,
                     noiseMode = noiseReductionMode,
@@ -284,14 +297,10 @@ fun TopHeaderBar(
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             // 主题切换按键
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(NeoCyberYellow)
-                    .border(2.dp, borderColor, RoundedCornerShape(10.dp))
-                    .clickable { onToggleTheme() },
-                contentAlignment = Alignment.Center
+            AnimatedIconButton(
+                backgroundColor = NeoCyberYellow,
+                borderColor = borderColor,
+                onClick = onToggleTheme
             ) {
                 Icon(
                     imageVector = when (themeMode) {
@@ -306,14 +315,10 @@ fun TopHeaderBar(
             }
 
             // 设置按键
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(NeoAcidLime)
-                    .border(2.dp, borderColor, RoundedCornerShape(10.dp))
-                    .clickable { onOpenSettings() },
-                contentAlignment = Alignment.Center
+            AnimatedIconButton(
+                backgroundColor = NeoAcidLime,
+                borderColor = borderColor,
+                onClick = onOpenSettings
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -323,6 +328,38 @@ fun TopHeaderBar(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun AnimatedIconButton(
+    backgroundColor: Color,
+    borderColor: Color,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val animOffset by animateDpAsState(
+        targetValue = if (isPressed) 2.dp else 0.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "btnOffset"
+    )
+
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .offset(x = animOffset, y = animOffset)
+            .clip(RoundedCornerShape(10.dp))
+            .background(backgroundColor)
+            .border(2.dp, borderColor, RoundedCornerShape(10.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        content()
     }
 }
 
@@ -425,14 +462,10 @@ fun DjiHardwareCard(
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(NeoElectricCyan)
-                    .border(2.dp, borderColor, RoundedCornerShape(8.dp))
-                    .clickable { onRefresh() },
-                contentAlignment = Alignment.Center
+            AnimatedIconButton(
+                backgroundColor = NeoElectricCyan,
+                borderColor = borderColor,
+                onClick = onRefresh
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
@@ -458,7 +491,20 @@ fun TimerDisplay(
     val millis = (durationMs % 1000) / 10
 
     val timeString = String.format(Locale.getDefault(), "%02d:%02d:%02d.%02d", hours, minutes, seconds, millis)
+    val isRecording = status == RecorderStatus.RECORDING
     val borderColor = MaterialTheme.colorScheme.outline
+
+    // 呼吸脉冲动效
+    val infiniteTransition = rememberInfiniteTransition(label = "recPulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = if (isRecording) 1.35f else 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseScale"
+    )
 
     Box(modifier = Modifier.fillMaxWidth()) {
         // 底层实体硬阴影
@@ -477,7 +523,7 @@ fun TimerDisplay(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                .border(2.5.dp, if (isRecording) NeoHotRed else borderColor, RoundedCornerShape(14.dp))
                 .padding(vertical = 16.dp, horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -543,7 +589,7 @@ fun TimerDisplay(
                             fontFamily = FontFamily.Monospace,
                             letterSpacing = 2.sp
                         ),
-                        color = if (status == RecorderStatus.RECORDING) NeoHotRed else MaterialTheme.colorScheme.onSurface
+                        color = if (isRecording) NeoHotRed else MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -555,12 +601,13 @@ fun TimerDisplay(
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
+                                .scale(if (isRecording) pulseScale else 1f)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(if (status == RecorderStatus.RECORDING) NeoHotRed else NeoAcidLime)
+                                .background(if (isRecording) NeoHotRed else NeoAcidLime)
                                 .border(1.dp, borderColor, RoundedCornerShape(2.dp))
                         )
                         Text(
-                            text = if (status == RecorderStatus.RECORDING) "REC LIVE • 48000 HZ" else "STANDBY • READY TO CAPTURE",
+                            text = if (isRecording) "REC LIVE • 48000 HZ" else "STANDBY • READY TO CAPTURE",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.sp
@@ -688,6 +735,7 @@ fun RecordingItemRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .animateContentSize(spring(dampingRatio = Spring.DampingRatioLowBouncy))
                 .clip(RoundedCornerShape(10.dp))
                 .background(if (isCurrentPlaying) NeoAcidLime.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface)
                 .border(2.dp, borderColor, RoundedCornerShape(10.dp))
@@ -721,12 +769,20 @@ fun RecordingItemRow(
                     }
 
                     Column {
-                        Text(
-                            text = item.file.name,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Black),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = item.file.name,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Black),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1
+                            )
+                            if (isCurrentPlaying) {
+                                AnimatedEqualizerBars()
+                            }
+                        }
                         Spacer(modifier = Modifier.height(2.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
@@ -784,6 +840,39 @@ fun RecordingItemRow(
     }
 }
 
+/**
+ * 播放中动态跳动的 3 条音轨柱动画
+ */
+@Composable
+fun AnimatedEqualizerBars() {
+    val infiniteTransition = rememberInfiniteTransition(label = "eq")
+    val h1 by infiniteTransition.animateFloat(
+        initialValue = 4f, targetValue = 14f,
+        animationSpec = infiniteRepeatable(tween(350, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "h1"
+    )
+    val h2 by infiniteTransition.animateFloat(
+        initialValue = 12f, targetValue = 4f,
+        animationSpec = infiniteRepeatable(tween(280, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "h2"
+    )
+    val h3 by infiniteTransition.animateFloat(
+        initialValue = 6f, targetValue = 16f,
+        animationSpec = infiniteRepeatable(tween(420, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "h3"
+    )
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier.height(14.dp)
+    ) {
+        Box(modifier = Modifier.width(2.5.dp).height(h1.dp).background(NeoAcidLime))
+        Box(modifier = Modifier.width(2.5.dp).height(h2.dp).background(NeoCyberYellow))
+        Box(modifier = Modifier.width(2.5.dp).height(h3.dp).background(NeoHotRed))
+    }
+}
+
 @Composable
 fun BottomControlBar(
     status: RecorderStatus,
@@ -806,6 +895,14 @@ fun BottomControlBar(
                 .weight(1f)
                 .height(56.dp)
         ) {
+            val interactionSource = remember { MutableInteractionSource() }
+            val isPressed by interactionSource.collectIsPressedAsState()
+            val animOffset by animateDpAsState(
+                targetValue = if (isPressed) 2.5.dp else 0.dp,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "noiseBtnOffset"
+            )
+
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -817,10 +914,14 @@ fun BottomControlBar(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
+                    .offset(x = animOffset, y = animOffset)
                     .clip(RoundedCornerShape(12.dp))
                     .background(NeoLavender)
                     .border(2.5.dp, borderColor, RoundedCornerShape(12.dp))
-                    .clickable { onOpenNoiseSheet() }
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { onOpenNoiseSheet() }
                     .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -849,6 +950,20 @@ fun BottomControlBar(
                 .weight(1.4f)
                 .height(56.dp)
         ) {
+            val interactionSource = remember { MutableInteractionSource() }
+            val isPressed by interactionSource.collectIsPressedAsState()
+            val animOffset by animateDpAsState(
+                targetValue = if (isPressed) 3.dp else 0.dp,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "recBtnOffset"
+            )
+
+            val btnBg by animateColorAsState(
+                targetValue = if (isRecording) NeoHotRed else NeoAcidLime,
+                animationSpec = tween(300),
+                label = "btnBgColor"
+            )
+
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -860,28 +975,45 @@ fun BottomControlBar(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
+                    .offset(x = animOffset, y = animOffset)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (isRecording) NeoHotRed else NeoAcidLime)
+                    .background(btnBg)
                     .border(2.5.dp, borderColor, RoundedCornerShape(12.dp))
-                    .clickable { if (isRecording) onStop() else onStart() },
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { if (isRecording) onStop() else onStart() },
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                    contentDescription = if (isRecording) "Stop" else "Record",
-                    tint = if (isRecording) NeoWhite else NeoBlack,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = if (isRecording) "STOP RECORD" else "REC NOW",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 1.sp
-                    ),
-                    color = if (isRecording) NeoWhite else NeoBlack
-                )
+                AnimatedContent(
+                    targetState = isRecording,
+                    transitionSpec = {
+                        fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                    },
+                    label = "btnContent"
+                ) { rec ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = if (rec) Icons.Default.Stop else Icons.Default.Mic,
+                            contentDescription = if (rec) "Stop" else "Record",
+                            tint = if (rec) NeoWhite else NeoBlack,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (rec) "STOP RECORD" else "REC NOW",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp
+                            ),
+                            color = if (rec) NeoWhite else NeoBlack
+                        )
+                    }
+                }
             }
         }
     }
