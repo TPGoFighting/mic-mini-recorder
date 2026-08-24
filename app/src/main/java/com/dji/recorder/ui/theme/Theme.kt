@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
@@ -44,143 +45,168 @@ import com.dji.recorder.model.AppThemeMode
 import com.dji.recorder.model.AppThemeStyle
 
 // ==========================================
-// 🎨 主题色彩系统定义
+// 🎨 5 大主题色彩库 (Color Palettes)
 // ==========================================
 
-// 基础黑白
 val NeoBlack = Color(0xFF000000)
 val NeoWhite = Color(0xFFFFFFFF)
 
-// 1. 新粗野主义 (Neo-Brutalism) 酸性撞色盘
-val NeoAcidLime = Color(0xFFCCFF00)    // 酸性电光绿 (品牌主色 / 安全 / 就绪)
-val NeoCyberYellow = Color(0xFFFFE600) // 高能波普黄 (降噪 / 警告 / 格式)
-val NeoHotRed = Color(0xFFFF3366)      // 热辣电光红 (录音 REC / 停止按钮 / 严重告警)
-val NeoElectricCyan = Color(0xFF00F0FF)// 极客电光青 (USB 状态 / 传输 / 刷新)
-val NeoLavender = Color(0xFFD8B4FE)    // 浅紫粉晶
-val NeoOrange = Color(0xFFFF7A00)      // 活力亮橙
-
+// 1. 新粗野主义 (Neo-Brutalism)
+val NeoAcidLime = Color(0xFFCCFF00)
+val NeoCyberYellow = Color(0xFFFFE600)
+val NeoHotRed = Color(0xFFFF3366)
+val NeoElectricCyan = Color(0xFF00F0FF)
+val NeoLavender = Color(0xFFD8B4FE)
 val NeoBgLight = Color(0xFFF7F4EC)
-val NeoSurfaceLight = Color(0xFFFFFFFF)
 val NeoBgDark = Color(0xFF101216)
 val NeoSurfaceDark = Color(0xFF1B1E24)
 
-// 2. 经典演播室 (Classic Studio) 大疆原厂雅致色盘
+// 2. 扁平化风格 (Flat Design)
+val FlatIndigo = Color(0xFF4F46E5)
+val FlatIndigoLight = Color(0xFF6366F1)
+val FlatEmerald = Color(0xFF10B981)
+val FlatAmber = Color(0xFFF59E0B)
+val FlatRose = Color(0xFFF43F5E)
+val FlatBgLight = Color(0xFFF8FAFC)
+val FlatSurfaceLight = Color(0xFFFFFFFF)
+val FlatBorderLight = Color(0xFFE2E8F0)
+val FlatBgDark = Color(0xFF0F172A)
+val FlatSurfaceDark = Color(0xFF1E293B)
+val FlatBorderDark = Color(0xFF334155)
+
+// 3. 复古拟物化 (Skeuomorphism)
+val SkeuoGold = Color(0xFFD4AF37)
+val SkeuoAmber = Color(0xFFFFB300)
+val SkeuoLedRed = Color(0xFFFF3B30)
+val SkeuoMetalLightTop = Color(0xFFFFFFFF)
+val SkeuoMetalLightBottom = Color(0xFFD8DEE4)
+val SkeuoMetalDarkTop = Color(0xFF2C3038)
+val SkeuoMetalDarkBottom = Color(0xFF181A1F)
+val SkeuoBgLight = Color(0xFFE5E9EC)
+val SkeuoBgDark = Color(0xFF121417)
+
+// 4. 软柔新拟态 (Neumorphism)
+val NeuBaseLight = Color(0xFFE8ECF2)
+val NeuHighlightLight = Color(0xFFFFFFFF)
+val NeuShadowLight = Color(0xFFB8C2CC)
+val NeuBaseDark = Color(0xFF181B20)
+val NeuHighlightDark = Color(0xFF242930)
+val NeuShadowDark = Color(0xFF0E1013)
+val NeuCyan = Color(0xFF00E5FF)
+val NeuCoral = Color(0xFFFF5252)
+
+// 5. 经典演播室 (Classic Studio)
 val ClassicTeal = Color(0xFF008779)
 val ClassicTealLight = Color(0xFF4DB6AC)
-val ClassicTealContainer = Color(0xFFE0F2F1)
-val ClassicTealDarkContainer = Color(0xFF133834)
 val ClassicYellow = Color(0xFFFFB800)
-val ClassicGreen = Color(0xFF00C853)
-val ClassicRed = Color(0xFFFF5252)
-
 val ClassicBgDark = Color(0xFF111315)
 val ClassicSurfaceDark = Color(0xFF1A1D20)
-val ClassicSurfaceVariantDark = Color(0xFF24282D)
-val ClassicBorderDark = Color(0xFF323842)
-val ClassicTextPrimaryDark = Color(0xFFF0F2F5)
-val ClassicTextSecondaryDark = Color(0xFF9EACB9)
-
 val ClassicBgLight = Color(0xFFF2F5F8)
 val ClassicSurfaceLight = Color(0xFFFFFFFF)
-val ClassicSurfaceVariantLight = Color(0xFFE8EEF3)
-val ClassicBorderLight = Color(0xFFD6DFE8)
-val ClassicTextPrimaryLight = Color(0xFF191C1E)
-val ClassicTextSecondaryLight = Color(0xFF6B7280)
 
-// 兼容老命名
+// 兼容引用
 val DjiGreen = NeoAcidLime
 val DjiYellow = NeoCyberYellow
 val DjiRed = NeoHotRed
 val DjiTeal = NeoElectricCyan
 
-// CompositionLocal 传递当前视觉风格
 val LocalThemeStyle = staticCompositionLocalOf { AppThemeStyle.NEO_BRUTALISM }
 
 // ==========================================
-// 🎨 Color Schemes
+// 🎨 Color Scheme 工厂
 // ==========================================
 
-// Neo-Brutalism Color Schemes
-private val NeoDarkColorScheme = darkColorScheme(
-    primary = NeoAcidLime,
-    onPrimary = NeoBlack,
-    primaryContainer = Color(0xFF283618),
-    onPrimaryContainer = NeoAcidLime,
-    secondary = NeoCyberYellow,
-    onSecondary = NeoBlack,
-    secondaryContainer = Color(0xFF3E3610),
-    onSecondaryContainer = NeoCyberYellow,
-    background = NeoBgDark,
-    onBackground = NeoWhite,
-    surface = NeoSurfaceDark,
-    onSurface = NeoWhite,
-    surfaceVariant = Color(0xFF262B34),
-    onSurfaceVariant = Color(0xFFB0BAC5),
-    outline = Color(0xFFFFFFFF),
-    error = NeoHotRed,
-    onError = NeoWhite
-)
+private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (style) {
+    AppThemeStyle.NEO_BRUTALISM -> if (isDark) {
+        darkColorScheme(
+            primary = NeoAcidLime, onPrimary = NeoBlack,
+            secondary = NeoCyberYellow, onSecondary = NeoBlack,
+            background = NeoBgDark, surface = NeoSurfaceDark,
+            surfaceVariant = Color(0xFF262B34), onSurface = NeoWhite,
+            outline = NeoWhite, error = NeoHotRed
+        )
+    } else {
+        lightColorScheme(
+            primary = Color(0xFF008779), onPrimary = NeoWhite,
+            secondary = NeoCyberYellow, onSecondary = NeoBlack,
+            background = NeoBgLight, surface = NeoWhite,
+            surfaceVariant = Color(0xFFEBE6DC), onSurface = NeoBlack,
+            outline = NeoBlack, error = NeoHotRed
+        )
+    }
 
-private val NeoLightColorScheme = lightColorScheme(
-    primary = Color(0xFF008779),
-    onPrimary = NeoWhite,
-    primaryContainer = NeoAcidLime,
-    onPrimaryContainer = NeoBlack,
-    secondary = NeoCyberYellow,
-    onSecondary = NeoBlack,
-    secondaryContainer = Color(0xFFFFF7C2),
-    onSecondaryContainer = NeoBlack,
-    background = NeoBgLight,
-    onBackground = NeoBlack,
-    surface = NeoSurfaceLight,
-    onSurface = NeoBlack,
-    surfaceVariant = Color(0xFFEBE6DC),
-    onSurfaceVariant = Color(0xFF333333),
-    outline = NeoBlack,
-    error = NeoHotRed,
-    onError = NeoWhite
-)
+    AppThemeStyle.FLAT_DESIGN -> if (isDark) {
+        darkColorScheme(
+            primary = FlatIndigoLight, onPrimary = NeoWhite,
+            secondary = FlatEmerald, onSecondary = NeoWhite,
+            background = FlatBgDark, surface = FlatSurfaceDark,
+            surfaceVariant = Color(0xFF273549), onSurface = Color(0xFFF8FAFC),
+            outline = FlatBorderDark, error = FlatRose
+        )
+    } else {
+        lightColorScheme(
+            primary = FlatIndigo, onPrimary = NeoWhite,
+            secondary = FlatEmerald, onSecondary = NeoWhite,
+            background = FlatBgLight, surface = FlatSurfaceLight,
+            surfaceVariant = Color(0xFFF1F5F9), onSurface = Color(0xFF0F172A),
+            outline = FlatBorderLight, error = FlatRose
+        )
+    }
 
-// Classic Studio Color Schemes
-private val ClassicDarkColorScheme = darkColorScheme(
-    primary = ClassicTealLight,
-    onPrimary = Color.Black,
-    primaryContainer = ClassicTealDarkContainer,
-    onPrimaryContainer = ClassicTealLight,
-    secondary = ClassicYellow,
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF3E2E10),
-    onSecondaryContainer = ClassicYellow,
-    background = ClassicBgDark,
-    onBackground = ClassicTextPrimaryDark,
-    surface = ClassicSurfaceDark,
-    onSurface = ClassicTextPrimaryDark,
-    surfaceVariant = ClassicSurfaceVariantDark,
-    onSurfaceVariant = ClassicTextSecondaryDark,
-    outline = ClassicBorderDark,
-    error = ClassicRed,
-    onError = Color.White
-)
+    AppThemeStyle.SKEUOMORPHISM -> if (isDark) {
+        darkColorScheme(
+            primary = SkeuoGold, onPrimary = NeoBlack,
+            secondary = SkeuoAmber, onSecondary = NeoBlack,
+            background = SkeuoBgDark, surface = Color(0xFF1E2126),
+            surfaceVariant = Color(0xFF2B2F38), onSurface = Color(0xFFE2E8F0),
+            outline = Color(0xFF424754), error = SkeuoLedRed
+        )
+    } else {
+        lightColorScheme(
+            primary = Color(0xFF996515), onPrimary = NeoWhite,
+            secondary = SkeuoAmber, onSecondary = NeoBlack,
+            background = SkeuoBgLight, surface = Color(0xFFF0F3F6),
+            surfaceVariant = Color(0xFFDDE3EA), onSurface = Color(0xFF1E2228),
+            outline = Color(0xFFBAC3CD), error = SkeuoLedRed
+        )
+    }
 
-private val ClassicLightColorScheme = lightColorScheme(
-    primary = ClassicTeal,
-    onPrimary = Color.White,
-    primaryContainer = ClassicTealContainer,
-    onPrimaryContainer = ClassicTeal,
-    secondary = ClassicYellow,
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFFFFF3E0),
-    onSecondaryContainer = Color(0xFF8A5A00),
-    background = ClassicBgLight,
-    onBackground = ClassicTextPrimaryLight,
-    surface = ClassicSurfaceLight,
-    onSurface = ClassicTextPrimaryLight,
-    surfaceVariant = ClassicSurfaceVariantLight,
-    onSurfaceVariant = ClassicTextSecondaryLight,
-    outline = ClassicBorderLight,
-    error = ClassicRed,
-    onError = Color.White
-)
+    AppThemeStyle.NEUMORPHISM -> if (isDark) {
+        darkColorScheme(
+            primary = NeuCyan, onPrimary = NeoBlack,
+            secondary = Color(0xFF81D4FA), onSecondary = NeoBlack,
+            background = NeuBaseDark, surface = NeuBaseDark,
+            surfaceVariant = Color(0xFF20242B), onSurface = Color(0xFFE0E5EC),
+            outline = Color(0xFF2A303A), error = NeuCoral
+        )
+    } else {
+        lightColorScheme(
+            primary = Color(0xFF0097A7), onPrimary = NeoWhite,
+            secondary = Color(0xFF00ACC1), onSecondary = NeoWhite,
+            background = NeuBaseLight, surface = NeuBaseLight,
+            surfaceVariant = Color(0xFFDEE3EA), onSurface = Color(0xFF2D3748),
+            outline = Color(0xFFCBD5E1), error = NeuCoral
+        )
+    }
+
+    AppThemeStyle.CLASSIC_STUDIO -> if (isDark) {
+        darkColorScheme(
+            primary = ClassicTealLight, onPrimary = NeoBlack,
+            secondary = ClassicYellow, onSecondary = NeoBlack,
+            background = ClassicBgDark, surface = ClassicSurfaceDark,
+            surfaceVariant = Color(0xFF24282D), onSurface = Color(0xFFF0F2F5),
+            outline = Color(0xFF323842), error = Color(0xFFFF5252)
+        )
+    } else {
+        lightColorScheme(
+            primary = ClassicTeal, onPrimary = NeoWhite,
+            secondary = ClassicYellow, onSecondary = NeoBlack,
+            background = ClassicBgLight, surface = ClassicSurfaceLight,
+            surfaceVariant = Color(0xFFE8EEF3), onSurface = Color(0xFF191C1E),
+            outline = Color(0xFFD6DFE8), error = Color(0xFFFF5252)
+        )
+    }
+}
 
 @Composable
 fun DjiRecorderTheme(
@@ -194,10 +220,7 @@ fun DjiRecorderTheme(
         AppThemeMode.LIGHT -> false
     }
 
-    val colorScheme = when (themeStyle) {
-        AppThemeStyle.NEO_BRUTALISM -> if (isDark) NeoDarkColorScheme else NeoLightColorScheme
-        AppThemeStyle.CLASSIC_STUDIO -> if (isDark) ClassicDarkColorScheme else ClassicLightColorScheme
-    }
+    val colorScheme = buildColorScheme(themeStyle, isDark)
 
     CompositionLocalProvider(LocalThemeStyle provides themeStyle) {
         MaterialTheme(
@@ -208,12 +231,9 @@ fun DjiRecorderTheme(
 }
 
 // ==========================================
-// 🧱 自适应视觉风格化组件 (Neo-Brutalism & Classic Studio)
+// 🧱 5 大主题自适应卡片组件 (NeoCard)
 // ==========================================
 
-/**
- * 自适应卡片 (在 Neo-Brutalism 下表现为硬边框+硬阴影+机械下陷；在 Classic Studio 下表现为圆润柔和微阴影)
- */
 @Composable
 fun NeoCard(
     modifier: Modifier = Modifier,
@@ -227,81 +247,144 @@ fun NeoCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val currentStyle = LocalThemeStyle.current
-    val isNeo = currentStyle == AppThemeStyle.NEO_BRUTALISM
+    val style = LocalThemeStyle.current
+    val isDark = isSystemInDarkTheme()
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val animTranslate by animateDpAsState(
-        targetValue = if (isPressed && onClick != null && isNeo) 2.5.dp else 0.dp,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "cardTranslate"
-    )
-
-    val classicScale by animateFloatAsState(
-        targetValue = if (isPressed && onClick != null && !isNeo) 0.98f else 1.0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "classicScale"
-    )
-
-    if (isNeo) {
-        // Neo-Brutalism: 粗黑硬阴影 + 机械下沉
-        Box(modifier = modifier) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(x = shadowOffset, y = shadowOffset)
-                    .clip(shape)
-                    .background(shadowColor)
-                    .border(borderWidth, shadowColor, shape)
+    when (style) {
+        AppThemeStyle.NEO_BRUTALISM -> {
+            // 新粗野主义: 纯黑实体硬投影 + 机械下沉位移
+            val animTranslate by animateDpAsState(
+                targetValue = if (isPressed && onClick != null) 2.5.dp else 0.dp,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "cardNeo"
             )
+            Box(modifier = modifier) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = shadowOffset, y = shadowOffset)
+                        .clip(shape)
+                        .background(shadowColor)
+                        .border(borderWidth, shadowColor, shape)
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(x = animTranslate, y = animTranslate)
+                        .clip(shape)
+                        .background(backgroundColor)
+                        .border(borderWidth, borderColor, shape)
+                        .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
+                        .padding(padding),
+                    content = content
+                )
+            }
+        }
+
+        AppThemeStyle.FLAT_DESIGN -> {
+            // 极简扁平化: 纯净零阴影 + 纤细边框 + 极简圆角
+            val flatShape = RoundedCornerShape(10.dp)
+            val animAlpha by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.8f else 1.0f, label = "cardFlat")
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
-                    .offset(x = animTranslate, y = animTranslate)
-                    .clip(shape)
+                    .scale(animAlpha)
+                    .clip(flatShape)
                     .background(backgroundColor)
-                    .border(borderWidth, borderColor, shape)
-                    .then(
-                        if (onClick != null) {
-                            Modifier.clickable(
-                                interactionSource = interactionSource,
-                                indication = null
-                            ) { onClick() }
-                        } else Modifier
-                    )
+                    .border(1.dp, borderColor.copy(alpha = 0.6f), flatShape)
+                    .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
                     .padding(padding),
                 content = content
             )
         }
-    } else {
-        // Classic Studio: 柔和圆润卡片 + 轻微浮雕
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .scale(classicScale)
-                .shadow(2.dp, RoundedCornerShape(18.dp))
-                .clip(RoundedCornerShape(18.dp))
-                .background(backgroundColor)
-                .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
-                .then(
-                    if (onClick != null) {
-                        Modifier.clickable(
-                            interactionSource = interactionSource,
-                            indication = null
-                        ) { onClick() }
-                    } else Modifier
+
+        AppThemeStyle.SKEUOMORPHISM -> {
+            // 复古拟物化: 金属立体浮雕 + 双重渐变光泽
+            val skeuoShape = RoundedCornerShape(14.dp)
+            val animScale by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.98f else 1.0f, label = "cardSkeuo")
+            val brush = Brush.verticalGradient(
+                colors = if (isDark) listOf(SkeuoMetalDarkTop, SkeuoMetalDarkBottom)
+                else listOf(SkeuoMetalLightTop, SkeuoMetalLightBottom)
+            )
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .scale(animScale)
+                    .shadow(4.dp, skeuoShape)
+                    .clip(skeuoShape)
+                    .background(brush)
+                    .border(1.5.dp, if (isDark) Color(0xFF4A5260) else Color(0xFFBAC5D0), skeuoShape)
+                    .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
+                    .padding(padding),
+                content = content
+            )
+        }
+
+        AppThemeStyle.NEUMORPHISM -> {
+            // 软柔新拟态: 双向黏土柔光立体投影
+            val neuShape = RoundedCornerShape(18.dp)
+            val hiColor = if (isDark) NeuHighlightDark else NeuHighlightLight
+            val shColor = if (isDark) NeuShadowDark else NeuShadowLight
+            val offsetDist = if (isPressed && onClick != null) 1.dp else 4.dp
+
+            Box(modifier = modifier) {
+                // 亮光层 (Top-Left)
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = -offsetDist, y = -offsetDist)
+                        .clip(neuShape)
+                        .background(hiColor.copy(alpha = 0.7f))
                 )
-                .padding(padding),
-            content = content
-        )
+                // 暗影层 (Bottom-Right)
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = offsetDist, y = offsetDist)
+                        .clip(neuShape)
+                        .background(shColor.copy(alpha = 0.8f))
+                )
+                // 本体
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(neuShape)
+                        .background(backgroundColor)
+                        .border(1.dp, hiColor.copy(alpha = 0.4f), neuShape)
+                        .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
+                        .padding(padding),
+                    content = content
+                )
+            }
+        }
+
+        AppThemeStyle.CLASSIC_STUDIO -> {
+            // 经典演播室: 柔和圆润卡片 + 微阴影
+            val classicShape = RoundedCornerShape(16.dp)
+            val animScale by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.98f else 1.0f, label = "cardClassic")
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .scale(animScale)
+                    .shadow(2.dp, classicShape)
+                    .clip(classicShape)
+                    .background(backgroundColor)
+                    .border(1.dp, borderColor.copy(alpha = 0.5f), classicShape)
+                    .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
+                    .padding(padding),
+                content = content
+            )
+        }
     }
 }
 
-/**
- * 自适应实体按压按键
- */
+// ==========================================
+// 🧱 5 大主题自适应按键组件 (NeoButton)
+// ==========================================
+
 @Composable
 fun NeoButton(
     onClick: () -> Unit,
@@ -313,74 +396,145 @@ fun NeoButton(
     shape: Shape = RoundedCornerShape(14.dp),
     content: @Composable RowScope.() -> Unit
 ) {
-    val currentStyle = LocalThemeStyle.current
-    val isNeo = currentStyle == AppThemeStyle.NEO_BRUTALISM
+    val style = LocalThemeStyle.current
+    val isDark = isSystemInDarkTheme()
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val animTranslate by animateDpAsState(
-        targetValue = if (isPressed && isNeo) 3.dp else 0.dp,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
-        label = "btnTranslate"
-    )
-
-    val classicScale by animateFloatAsState(
-        targetValue = if (isPressed && !isNeo) 0.96f else 1.0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "classicBtnScale"
-    )
-
-    if (isNeo) {
-        Box(modifier = modifier) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(x = shadowOffset, y = shadowOffset)
-                    .clip(shape)
-                    .background(shadowColor)
-                    .border(2.5.dp, shadowColor, shape)
+    when (style) {
+        AppThemeStyle.NEO_BRUTALISM -> {
+            val animTranslate by animateDpAsState(
+                targetValue = if (isPressed) 3.dp else 0.dp,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "btnNeo"
             )
+            Box(modifier = modifier) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = shadowOffset, y = shadowOffset)
+                        .clip(shape)
+                        .background(shadowColor)
+                        .border(2.5.dp, shadowColor, shape)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(x = animTranslate, y = animTranslate)
+                        .clip(shape)
+                        .background(backgroundColor)
+                        .border(2.5.dp, borderColor, shape)
+                        .clickable(interactionSource, null) { onClick() }
+                        .padding(vertical = 14.dp, horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            }
+        }
+
+        AppThemeStyle.FLAT_DESIGN -> {
+            val flatShape = RoundedCornerShape(10.dp)
+            val animAlpha by animateFloatAsState(targetValue = if (isPressed) 0.82f else 1.0f, label = "btnFlat")
             Row(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
-                    .offset(x = animTranslate, y = animTranslate)
-                    .clip(shape)
+                    .scale(animAlpha)
+                    .clip(flatShape)
                     .background(backgroundColor)
-                    .border(2.5.dp, borderColor, shape)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { onClick() }
+                    .clickable(interactionSource, null) { onClick() }
                     .padding(vertical = 14.dp, horizontal = 20.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 content = content
             )
         }
-    } else {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .scale(classicScale)
-                .shadow(3.dp, RoundedCornerShape(16.dp))
-                .clip(RoundedCornerShape(16.dp))
-                .background(backgroundColor)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) { onClick() }
-                .padding(vertical = 14.dp, horizontal = 20.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
+
+        AppThemeStyle.SKEUOMORPHISM -> {
+            val skeuoShape = RoundedCornerShape(14.dp)
+            val animScale by animateFloatAsState(targetValue = if (isPressed) 0.96f else 1.0f, label = "btnSkeuo")
+            val brush = Brush.verticalGradient(
+                colors = listOf(
+                    backgroundColor.copy(alpha = 0.9f),
+                    backgroundColor.copy(alpha = 0.6f)
+                )
+            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .scale(animScale)
+                    .shadow(4.dp, skeuoShape)
+                    .clip(skeuoShape)
+                    .background(brush)
+                    .border(2.dp, if (isDark) Color(0xFF6B7280) else Color(0xFFCBD5E1), skeuoShape)
+                    .clickable(interactionSource, null) { onClick() }
+                    .padding(vertical = 14.dp, horizontal = 20.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
+        }
+
+        AppThemeStyle.NEUMORPHISM -> {
+            val neuShape = RoundedCornerShape(16.dp)
+            val hiColor = if (isDark) NeuHighlightDark else NeuHighlightLight
+            val shColor = if (isDark) NeuShadowDark else NeuShadowLight
+            val offsetDist = if (isPressed) 1.dp else 3.5.dp
+
+            Box(modifier = modifier) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = -offsetDist, y = -offsetDist)
+                        .clip(neuShape)
+                        .background(hiColor.copy(alpha = 0.8f))
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = offsetDist, y = offsetDist)
+                        .clip(neuShape)
+                        .background(shColor.copy(alpha = 0.9f))
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(neuShape)
+                        .background(backgroundColor)
+                        .clickable(interactionSource, null) { onClick() }
+                        .padding(vertical = 14.dp, horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            }
+        }
+
+        AppThemeStyle.CLASSIC_STUDIO -> {
+            val classicShape = RoundedCornerShape(14.dp)
+            val animScale by animateFloatAsState(targetValue = if (isPressed) 0.96f else 1.0f, label = "btnClassic")
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .scale(animScale)
+                    .shadow(3.dp, classicShape)
+                    .clip(classicShape)
+                    .background(backgroundColor)
+                    .clickable(interactionSource, null) { onClick() }
+                    .padding(vertical = 14.dp, horizontal = 20.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
+        }
     }
 }
 
-/**
- * 自适应标签 Badge
- */
+// ==========================================
+// 🧱 5 大主题自适应标签组件 (NeoBadge)
+// ==========================================
+
 @Composable
 fun NeoBadge(
     text: String,
@@ -392,32 +546,28 @@ fun NeoBadge(
     shape: Shape = RoundedCornerShape(6.dp),
     onClick: (() -> Unit)? = null
 ) {
-    val currentStyle = LocalThemeStyle.current
-    val isNeo = currentStyle == AppThemeStyle.NEO_BRUTALISM
+    val style = LocalThemeStyle.current
+    val isNeo = style == AppThemeStyle.NEO_BRUTALISM
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val animScale by animateDpAsState(
         targetValue = if (isPressed && onClick != null && isNeo) 1.5.dp else 0.dp,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "badgeScale"
     )
 
     Box(
         modifier = modifier
             .offset(x = animScale, y = animScale)
-            .clip(if (isNeo) shape else RoundedCornerShape(8.dp))
-            .background(if (isNeo) backgroundColor else backgroundColor.copy(alpha = 0.18f))
+            .clip(if (isNeo) shape else RoundedCornerShape(6.dp))
+            .background(if (isNeo) backgroundColor else backgroundColor.copy(alpha = 0.22f))
             .then(
                 if (isNeo) Modifier.border(borderWidth, borderColor, shape)
                 else Modifier
             )
             .then(
                 if (onClick != null) {
-                    Modifier.clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { onClick() }
+                    Modifier.clickable(interactionSource, null) { onClick() }
                 } else Modifier
             )
             .padding(horizontal = 8.dp, vertical = 3.dp)

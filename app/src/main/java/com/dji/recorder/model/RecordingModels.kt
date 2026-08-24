@@ -96,22 +96,43 @@ enum class AppThemeMode {
 }
 
 /**
- * UI 视觉设计风格主题
+ * 5 大顶级 UI 视觉设计风格主题体系
  */
 enum class AppThemeStyle(
     val title: String,
     val subtitle: String,
-    val badge: String
+    val badge: String,
+    val iconName: String
 ) {
     NEO_BRUTALISM(
         title = "新粗野主义 (Neo-Brutalism)",
-        subtitle = "2.5dp 粗黑实体边框 • 4dp 纯黑硬投影 • 酸性撞色 • 机械微动按压动效",
-        badge = "潮流极客"
+        subtitle = "2.5dp 粗黑实体边框 • 4dp 纯黑硬投影 • 高能酸性撞色 • 机械下陷按压动效",
+        badge = "潮流极客",
+        iconName = "Bolt"
+    ),
+    FLAT_DESIGN(
+        title = "极简扁平化 (Flat Design)",
+        subtitle = "零阴影纯色块 • 纯净纤细线条 • 高对比清晰明快 • 极简现代美学",
+        badge = "现代极简",
+        iconName = "Layers"
+    ),
+    SKEUOMORPHISM(
+        title = "复古拟物化 (Skeuomorphism)",
+        subtitle = "拉丝金属拉花 • 真实立体浮雕边框 • 拟物光泽高光 • 经典实体音频硬件感",
+        badge = "复古经典",
+        iconName = "Tune"
+    ),
+    NEUMORPHISM(
+        title = "软柔新拟态 (Neumorphism)",
+        subtitle = "双向双色柔和光影 • 黏土微凹凸浮雕 • 浑然天成的实体触觉与优雅高级感",
+        badge = "先锋拟态",
+        iconName = "BlurOn"
     ),
     CLASSIC_STUDIO(
         title = "经典演播室 (Classic Studio)",
-        subtitle = "大疆原厂青金配色 • 柔和圆角卡片 • 沉浸低调专业录音棚质感",
-        badge = "原厂极简"
+        subtitle = "大疆原厂青金配色 • 柔和圆角微浮雕 • 沉浸低调专业录音棚质感",
+        badge = "大疆原厂",
+        iconName = "Mic"
     )
 }
 

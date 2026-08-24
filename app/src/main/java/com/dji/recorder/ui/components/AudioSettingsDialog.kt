@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Audiotrack
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Folder
@@ -68,15 +69,15 @@ import com.dji.recorder.ui.theme.NeoHotRed
 import com.dji.recorder.ui.theme.NeoLavender
 
 /**
- * 新粗野风格 (Neo-Brutalism) 音频编码、存储路径与双视觉主题设置面板
+ * 音频编码与硬件参数设置面板（含视觉主题选择独立入口）
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AudioSettingsDialog(
     currentConfig: AudioConfig,
     currentThemeStyle: AppThemeStyle,
+    onOpenThemeSelection: () -> Unit,
     onSaveConfig: (AudioConfig) -> Unit,
-    onSelectThemeStyle: (AppThemeStyle) -> Unit,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -181,63 +182,86 @@ fun AudioSettingsDialog(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // 0. 主题视觉风格选择 (新粗野风格 / 经典演播室)
+            // 0. 主题视觉风格选择入口按钮
             NeoSectionTitle(icon = Icons.Default.Palette, title = "THEME DESIGN STYLE • 视觉主题风格")
             Spacer(modifier = Modifier.height(8.dp))
 
-            AppThemeStyle.entries.forEach { style ->
-                val isSelected = currentThemeStyle == style
+            Box(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 3.dp, y = 3.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.Black)
+                        .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
+                )
+                Row(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(if (isSelected) NeoAcidLime.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant)
-                        .border(if (isSelected) 2.dp else 1.5.dp, if (isSelected) borderColor else borderColor.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
-                        .clickable { onSelectThemeStyle(style) }
-                        .padding(12.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(NeoAcidLime.copy(alpha = 0.25f))
+                        .border(2.dp, borderColor, RoundedCornerShape(12.dp))
+                        .clickable { onOpenThemeSelection() }
+                        .padding(14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(NeoAcidLime)
+                                .border(1.5.dp, borderColor, RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Palette,
+                                contentDescription = null,
+                                tint = NeoBlack,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Column {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
                                 Text(
-                                    text = style.title,
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Black),
+                                    text = currentThemeStyle.title,
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 NeoBadge(
-                                    text = style.badge,
-                                    backgroundColor = if (style == AppThemeStyle.NEO_BRUTALISM) NeoCyberYellow else NeoElectricCyan,
+                                    text = currentThemeStyle.badge,
+                                    backgroundColor = NeoCyberYellow,
                                     textColor = NeoBlack
                                 )
                             }
-                            Spacer(modifier = Modifier.height(3.dp))
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = style.subtitle,
+                                text = "点此切换 5 款顶级 UI 视觉风格",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-
-                        if (isSelected) {
-                            NeoBadge(
-                                text = "CURRENT",
-                                backgroundColor = NeoAcidLime,
-                                textColor = NeoBlack
-                            )
-                        }
                     }
+
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Open",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 1. 存储位置自定义
             NeoSectionTitle(icon = Icons.Default.Folder, title = "STORAGE DIRECTORY • 保存路径")
@@ -382,8 +406,8 @@ fun AudioSettingsDialog(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(if (isSelected) NeoElectricCyan else MaterialTheme.colorScheme.surfaceVariant)
                                 .border(2.dp, borderColor, RoundedCornerShape(8.dp))
-                            .clickable { selectedBitrate = br }
-                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                                .clickable { selectedBitrate = br }
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
                         ) {
                             Text(
                                 text = "$br kbps",

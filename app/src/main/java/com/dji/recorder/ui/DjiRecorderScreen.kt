@@ -85,6 +85,7 @@ import com.dji.recorder.model.RecorderStatus
 import com.dji.recorder.model.RecordingItem
 import com.dji.recorder.ui.components.AudioSettingsDialog
 import com.dji.recorder.ui.components.NoiseReductionBottomSheet
+import com.dji.recorder.ui.components.ThemeSelectionSheet
 import com.dji.recorder.ui.components.WaveformVisualizer
 import com.dji.recorder.ui.theme.NeoAcidLime
 import com.dji.recorder.ui.theme.NeoBadge
@@ -139,6 +140,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
 
     var showNoiseReductionSheet by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var showThemeSelectionSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let {
@@ -159,9 +161,19 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
         AudioSettingsDialog(
             currentConfig = audioConfig,
             currentThemeStyle = themeStyle,
+            onOpenThemeSelection = { showThemeSelectionSheet = true },
             onSaveConfig = { viewModel.updateAudioConfig(it) },
-            onSelectThemeStyle = { viewModel.setThemeStyle(it) },
             onDismiss = { showSettingsDialog = false }
+        )
+    }
+
+    if (showThemeSelectionSheet) {
+        ThemeSelectionSheet(
+            currentThemeStyle = themeStyle,
+            onSelectThemeStyle = {
+                viewModel.setThemeStyle(it)
+            },
+            onDismiss = { showThemeSelectionSheet = false }
         )
     }
 
