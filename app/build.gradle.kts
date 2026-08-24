@@ -11,8 +11,8 @@ android {
         applicationId = "com.dji.recorder"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1000
-        versionName = "1.0.0.0"
+        versionCode = 10100
+        versionName = "1.1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

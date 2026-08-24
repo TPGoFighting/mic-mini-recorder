@@ -310,7 +310,7 @@ fun TopHeaderBar(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "PRO AUDIO ENGINE • v1.0",
+                    text = "PRO AUDIO ENGINE • v1.1.0.0",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
