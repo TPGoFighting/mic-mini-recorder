@@ -45,7 +45,7 @@ import com.dji.recorder.model.AppThemeMode
 import com.dji.recorder.model.AppThemeStyle
 
 // ==========================================
-// 🎨 5 大主题色彩库 (Color Palettes)
+// 🎨 5 大主题色盘 (高对比度设计)
 // ==========================================
 
 val NeoBlack = Color(0xFF000000)
@@ -57,11 +57,12 @@ val NeoCyberYellow = Color(0xFFFFE600)
 val NeoHotRed = Color(0xFFFF3366)
 val NeoElectricCyan = Color(0xFF00F0FF)
 val NeoLavender = Color(0xFFD8B4FE)
-val NeoBgLight = Color(0xFFF7F4EC)
-val NeoBgDark = Color(0xFF101216)
-val NeoSurfaceDark = Color(0xFF1B1E24)
+val NeoBgLight = Color(0xFFFBF8F2)
+val NeoSurfaceLight = Color(0xFFFFFFFF)
+val NeoBgDark = Color(0xFF0E1013)
+val NeoSurfaceDark = Color(0xFF181B20)
 
-// 2. 扁平化风格 (Flat Design)
+// 2. 极简扁平化 (Flat Design)
 val FlatIndigo = Color(0xFF4F46E5)
 val FlatIndigoLight = Color(0xFF6366F1)
 val FlatEmerald = Color(0xFF10B981)
@@ -70,41 +71,44 @@ val FlatRose = Color(0xFFF43F5E)
 val FlatBgLight = Color(0xFFF8FAFC)
 val FlatSurfaceLight = Color(0xFFFFFFFF)
 val FlatBorderLight = Color(0xFFE2E8F0)
-val FlatBgDark = Color(0xFF0F172A)
-val FlatSurfaceDark = Color(0xFF1E293B)
-val FlatBorderDark = Color(0xFF334155)
+val FlatBgDark = Color(0xFF0B0F19)
+val FlatSurfaceDark = Color(0xFF151D2E)
+val FlatBorderDark = Color(0xFF222F46)
 
 // 3. 复古拟物化 (Skeuomorphism)
 val SkeuoGold = Color(0xFFD4AF37)
+val SkeuoGoldDark = Color(0xFF996515)
 val SkeuoAmber = Color(0xFFFFB300)
 val SkeuoLedRed = Color(0xFFFF3B30)
 val SkeuoMetalLightTop = Color(0xFFFFFFFF)
-val SkeuoMetalLightBottom = Color(0xFFD8DEE4)
-val SkeuoMetalDarkTop = Color(0xFF2C3038)
-val SkeuoMetalDarkBottom = Color(0xFF181A1F)
-val SkeuoBgLight = Color(0xFFE5E9EC)
-val SkeuoBgDark = Color(0xFF121417)
+val SkeuoMetalLightBottom = Color(0xFFD4DCE4)
+val SkeuoMetalDarkTop = Color(0xFF2E333E)
+val SkeuoMetalDarkBottom = Color(0xFF181A20)
+val SkeuoBgLight = Color(0xFFDDE4EB)
+val SkeuoBgDark = Color(0xFF111317)
+val SkeuoBorderLight = Color(0xFF8C9BAE)
+val SkeuoBorderDark = Color(0xFF4B5565)
 
 // 4. 软柔新拟态 (Neumorphism)
-val NeuBaseLight = Color(0xFFE8ECF2)
+val NeuBaseLight = Color(0xFFE0E5EC)
 val NeuHighlightLight = Color(0xFFFFFFFF)
-val NeuShadowLight = Color(0xFFB8C2CC)
-val NeuBaseDark = Color(0xFF181B20)
-val NeuHighlightDark = Color(0xFF242930)
-val NeuShadowDark = Color(0xFF0E1013)
-val NeuCyan = Color(0xFF00E5FF)
-val NeuCoral = Color(0xFFFF5252)
+val NeuShadowLight = Color(0xFFA3B1C2)
+val NeuBaseDark = Color(0xFF1E2229)
+val NeuHighlightDark = Color(0xFF2B313A)
+val NeuShadowDark = Color(0xFF111317)
+val NeuCyan = Color(0xFF00BCD4)
+val NeuCoral = Color(0xFFFF5722)
 
 // 5. 经典演播室 (Classic Studio)
 val ClassicTeal = Color(0xFF008779)
 val ClassicTealLight = Color(0xFF4DB6AC)
 val ClassicYellow = Color(0xFFFFB800)
-val ClassicBgDark = Color(0xFF111315)
-val ClassicSurfaceDark = Color(0xFF1A1D20)
-val ClassicBgLight = Color(0xFFF2F5F8)
+val ClassicBgDark = Color(0xFF101215)
+val ClassicSurfaceDark = Color(0xFF1A1D22)
+val ClassicBgLight = Color(0xFFF3F4F6)
 val ClassicSurfaceLight = Color(0xFFFFFFFF)
 
-// 兼容引用
+// 兼容老引用
 val DjiGreen = NeoAcidLime
 val DjiYellow = NeoCyberYellow
 val DjiRed = NeoHotRed
@@ -113,7 +117,7 @@ val DjiTeal = NeoElectricCyan
 val LocalThemeStyle = staticCompositionLocalOf { AppThemeStyle.NEO_BRUTALISM }
 
 // ==========================================
-// 🎨 Color Scheme 工厂
+// 🎨 Color Scheme 工厂 (保证高对比度)
 // ==========================================
 
 private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (style) {
@@ -121,17 +125,19 @@ private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (styl
         darkColorScheme(
             primary = NeoAcidLime, onPrimary = NeoBlack,
             secondary = NeoCyberYellow, onSecondary = NeoBlack,
-            background = NeoBgDark, surface = NeoSurfaceDark,
-            surfaceVariant = Color(0xFF262B34), onSurface = NeoWhite,
-            outline = NeoWhite, error = NeoHotRed
+            background = NeoBgDark, onBackground = NeoWhite,
+            surface = NeoSurfaceDark, onSurface = NeoWhite,
+            surfaceVariant = Color(0xFF252A32), onSurfaceVariant = Color(0xFFD1D5DB),
+            outline = NeoWhite, error = NeoHotRed, onError = NeoWhite
         )
     } else {
         lightColorScheme(
             primary = Color(0xFF008779), onPrimary = NeoWhite,
             secondary = NeoCyberYellow, onSecondary = NeoBlack,
-            background = NeoBgLight, surface = NeoWhite,
-            surfaceVariant = Color(0xFFEBE6DC), onSurface = NeoBlack,
-            outline = NeoBlack, error = NeoHotRed
+            background = NeoBgLight, onBackground = NeoBlack,
+            surface = NeoSurfaceLight, onSurface = NeoBlack,
+            surfaceVariant = Color(0xFFEBE6DC), onSurfaceVariant = Color(0xFF1F242D),
+            outline = NeoBlack, error = NeoHotRed, onError = NeoWhite
         )
     }
 
@@ -139,17 +145,19 @@ private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (styl
         darkColorScheme(
             primary = FlatIndigoLight, onPrimary = NeoWhite,
             secondary = FlatEmerald, onSecondary = NeoWhite,
-            background = FlatBgDark, surface = FlatSurfaceDark,
-            surfaceVariant = Color(0xFF273549), onSurface = Color(0xFFF8FAFC),
-            outline = FlatBorderDark, error = FlatRose
+            background = FlatBgDark, onBackground = Color(0xFFF8FAFC),
+            surface = FlatSurfaceDark, onSurface = Color(0xFFF8FAFC),
+            surfaceVariant = Color(0xFF1E293B), onSurfaceVariant = Color(0xFFCBD5E1),
+            outline = FlatBorderDark, error = FlatRose, onError = NeoWhite
         )
     } else {
         lightColorScheme(
             primary = FlatIndigo, onPrimary = NeoWhite,
             secondary = FlatEmerald, onSecondary = NeoWhite,
-            background = FlatBgLight, surface = FlatSurfaceLight,
-            surfaceVariant = Color(0xFFF1F5F9), onSurface = Color(0xFF0F172A),
-            outline = FlatBorderLight, error = FlatRose
+            background = FlatBgLight, onBackground = Color(0xFF0F172A),
+            surface = FlatSurfaceLight, onSurface = Color(0xFF0F172A),
+            surfaceVariant = Color(0xFFF1F5F9), onSurfaceVariant = Color(0xFF334155),
+            outline = FlatBorderLight, error = FlatRose, onError = NeoWhite
         )
     }
 
@@ -157,17 +165,19 @@ private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (styl
         darkColorScheme(
             primary = SkeuoGold, onPrimary = NeoBlack,
             secondary = SkeuoAmber, onSecondary = NeoBlack,
-            background = SkeuoBgDark, surface = Color(0xFF1E2126),
-            surfaceVariant = Color(0xFF2B2F38), onSurface = Color(0xFFE2E8F0),
-            outline = Color(0xFF424754), error = SkeuoLedRed
+            background = SkeuoBgDark, onBackground = Color(0xFFF3F4F6),
+            surface = Color(0xFF22262E), onSurface = Color(0xFFF3F4F6),
+            surfaceVariant = Color(0xFF2D323D), onSurfaceVariant = Color(0xFFD1D5DB),
+            outline = SkeuoBorderDark, error = SkeuoLedRed, onError = NeoWhite
         )
     } else {
         lightColorScheme(
-            primary = Color(0xFF996515), onPrimary = NeoWhite,
+            primary = SkeuoGoldDark, onPrimary = NeoWhite,
             secondary = SkeuoAmber, onSecondary = NeoBlack,
-            background = SkeuoBgLight, surface = Color(0xFFF0F3F6),
-            surfaceVariant = Color(0xFFDDE3EA), onSurface = Color(0xFF1E2228),
-            outline = Color(0xFFBAC3CD), error = SkeuoLedRed
+            background = SkeuoBgLight, onBackground = Color(0xFF111827),
+            surface = Color(0xFFFFFFFF), onSurface = Color(0xFF111827),
+            surfaceVariant = Color(0xFFE5ECF2), onSurfaceVariant = Color(0xFF374151),
+            outline = SkeuoBorderLight, error = SkeuoLedRed, onError = NeoWhite
         )
     }
 
@@ -175,17 +185,19 @@ private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (styl
         darkColorScheme(
             primary = NeuCyan, onPrimary = NeoBlack,
             secondary = Color(0xFF81D4FA), onSecondary = NeoBlack,
-            background = NeuBaseDark, surface = NeuBaseDark,
-            surfaceVariant = Color(0xFF20242B), onSurface = Color(0xFFE0E5EC),
-            outline = Color(0xFF2A303A), error = NeuCoral
+            background = NeuBaseDark, onBackground = Color(0xFFF1F5F9),
+            surface = NeuBaseDark, onSurface = Color(0xFFF1F5F9),
+            surfaceVariant = Color(0xFF252A33), onSurfaceVariant = Color(0xFFCBD5E1),
+            outline = NeuHighlightDark, error = NeuCoral, onError = NeoWhite
         )
     } else {
         lightColorScheme(
-            primary = Color(0xFF0097A7), onPrimary = NeoWhite,
+            primary = Color(0xFF00838F), onPrimary = NeoWhite,
             secondary = Color(0xFF00ACC1), onSecondary = NeoWhite,
-            background = NeuBaseLight, surface = NeuBaseLight,
-            surfaceVariant = Color(0xFFDEE3EA), onSurface = Color(0xFF2D3748),
-            outline = Color(0xFFCBD5E1), error = NeuCoral
+            background = NeuBaseLight, onBackground = Color(0xFF1E293B),
+            surface = NeuBaseLight, onSurface = Color(0xFF1E293B),
+            surfaceVariant = Color(0xFFD6DCE5), onSurfaceVariant = Color(0xFF334155),
+            outline = NeuShadowLight, error = NeuCoral, onError = NeoWhite
         )
     }
 
@@ -193,17 +205,19 @@ private fun buildColorScheme(style: AppThemeStyle, isDark: Boolean) = when (styl
         darkColorScheme(
             primary = ClassicTealLight, onPrimary = NeoBlack,
             secondary = ClassicYellow, onSecondary = NeoBlack,
-            background = ClassicBgDark, surface = ClassicSurfaceDark,
-            surfaceVariant = Color(0xFF24282D), onSurface = Color(0xFFF0F2F5),
-            outline = Color(0xFF323842), error = Color(0xFFFF5252)
+            background = ClassicBgDark, onBackground = Color(0xFFF9FAFB),
+            surface = ClassicSurfaceDark, onSurface = Color(0xFFF9FAFB),
+            surfaceVariant = Color(0xFF24282E), onSurfaceVariant = Color(0xFFD1D5DB),
+            outline = Color(0xFF374151), error = Color(0xFFFF5252), onError = NeoWhite
         )
     } else {
         lightColorScheme(
             primary = ClassicTeal, onPrimary = NeoWhite,
             secondary = ClassicYellow, onSecondary = NeoBlack,
-            background = ClassicBgLight, surface = ClassicSurfaceLight,
-            surfaceVariant = Color(0xFFE8EEF3), onSurface = Color(0xFF191C1E),
-            outline = Color(0xFFD6DFE8), error = Color(0xFFFF5252)
+            background = ClassicBgLight, onBackground = Color(0xFF111827),
+            surface = ClassicSurfaceLight, onSurface = Color(0xFF111827),
+            surfaceVariant = Color(0xFFE5E7EB), onSurfaceVariant = Color(0xFF374151),
+            outline = Color(0xFFD1D5DB), error = Color(0xFFFF5252), onError = NeoWhite
         )
     }
 }
@@ -255,7 +269,6 @@ fun NeoCard(
 
     when (style) {
         AppThemeStyle.NEO_BRUTALISM -> {
-            // 新粗野主义: 纯黑实体硬投影 + 机械下沉位移
             val animTranslate by animateDpAsState(
                 targetValue = if (isPressed && onClick != null) 2.5.dp else 0.dp,
                 animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -285,9 +298,8 @@ fun NeoCard(
         }
 
         AppThemeStyle.FLAT_DESIGN -> {
-            // 极简扁平化: 纯净零阴影 + 纤细边框 + 极简圆角
             val flatShape = RoundedCornerShape(10.dp)
-            val animAlpha by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.8f else 1.0f, label = "cardFlat")
+            val animAlpha by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.85f else 1.0f, label = "cardFlat")
             Column(
                 modifier = modifier
                     .fillMaxWidth()
@@ -302,7 +314,6 @@ fun NeoCard(
         }
 
         AppThemeStyle.SKEUOMORPHISM -> {
-            // 复古拟物化: 金属立体浮雕 + 双重渐变光泽
             val skeuoShape = RoundedCornerShape(14.dp)
             val animScale by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.98f else 1.0f, label = "cardSkeuo")
             val brush = Brush.verticalGradient(
@@ -313,10 +324,10 @@ fun NeoCard(
                 modifier = modifier
                     .fillMaxWidth()
                     .scale(animScale)
-                    .shadow(4.dp, skeuoShape)
+                    .shadow(5.dp, skeuoShape)
                     .clip(skeuoShape)
                     .background(brush)
-                    .border(1.5.dp, if (isDark) Color(0xFF4A5260) else Color(0xFFBAC5D0), skeuoShape)
+                    .border(1.5.dp, if (isDark) SkeuoBorderDark else SkeuoBorderLight, skeuoShape)
                     .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
                     .padding(padding),
                 content = content
@@ -324,36 +335,32 @@ fun NeoCard(
         }
 
         AppThemeStyle.NEUMORPHISM -> {
-            // 软柔新拟态: 双向黏土柔光立体投影
             val neuShape = RoundedCornerShape(18.dp)
             val hiColor = if (isDark) NeuHighlightDark else NeuHighlightLight
             val shColor = if (isDark) NeuShadowDark else NeuShadowLight
             val offsetDist = if (isPressed && onClick != null) 1.dp else 4.dp
 
             Box(modifier = modifier) {
-                // 亮光层 (Top-Left)
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .offset(x = -offsetDist, y = -offsetDist)
                         .clip(neuShape)
-                        .background(hiColor.copy(alpha = 0.7f))
+                        .background(hiColor.copy(alpha = 0.85f))
                 )
-                // 暗影层 (Bottom-Right)
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .offset(x = offsetDist, y = offsetDist)
                         .clip(neuShape)
-                        .background(shColor.copy(alpha = 0.8f))
+                        .background(shColor.copy(alpha = 0.9f))
                 )
-                // 本体
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(neuShape)
                         .background(backgroundColor)
-                        .border(1.dp, hiColor.copy(alpha = 0.4f), neuShape)
+                        .border(1.dp, hiColor.copy(alpha = 0.5f), neuShape)
                         .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
                         .padding(padding),
                     content = content
@@ -362,17 +369,16 @@ fun NeoCard(
         }
 
         AppThemeStyle.CLASSIC_STUDIO -> {
-            // 经典演播室: 柔和圆润卡片 + 微阴影
             val classicShape = RoundedCornerShape(16.dp)
             val animScale by animateFloatAsState(targetValue = if (isPressed && onClick != null) 0.98f else 1.0f, label = "cardClassic")
             Column(
                 modifier = modifier
                     .fillMaxWidth()
                     .scale(animScale)
-                    .shadow(2.dp, classicShape)
+                    .shadow(3.dp, classicShape)
                     .clip(classicShape)
                     .background(backgroundColor)
-                    .border(1.dp, borderColor.copy(alpha = 0.5f), classicShape)
+                    .border(1.dp, borderColor.copy(alpha = 0.6f), classicShape)
                     .then(if (onClick != null) Modifier.clickable(interactionSource, null) { onClick() } else Modifier)
                     .padding(padding),
                 content = content
@@ -436,7 +442,7 @@ fun NeoButton(
 
         AppThemeStyle.FLAT_DESIGN -> {
             val flatShape = RoundedCornerShape(10.dp)
-            val animAlpha by animateFloatAsState(targetValue = if (isPressed) 0.82f else 1.0f, label = "btnFlat")
+            val animAlpha by animateFloatAsState(targetValue = if (isPressed) 0.85f else 1.0f, label = "btnFlat")
             Row(
                 modifier = modifier
                     .fillMaxWidth()
@@ -456,8 +462,8 @@ fun NeoButton(
             val animScale by animateFloatAsState(targetValue = if (isPressed) 0.96f else 1.0f, label = "btnSkeuo")
             val brush = Brush.verticalGradient(
                 colors = listOf(
-                    backgroundColor.copy(alpha = 0.9f),
-                    backgroundColor.copy(alpha = 0.6f)
+                    backgroundColor,
+                    backgroundColor.copy(alpha = 0.7f)
                 )
             )
             Row(
@@ -488,7 +494,7 @@ fun NeoButton(
                         .matchParentSize()
                         .offset(x = -offsetDist, y = -offsetDist)
                         .clip(neuShape)
-                        .background(hiColor.copy(alpha = 0.8f))
+                        .background(hiColor.copy(alpha = 0.85f))
                 )
                 Box(
                     modifier = Modifier
@@ -532,7 +538,7 @@ fun NeoButton(
 }
 
 // ==========================================
-// 🧱 5 大主题自适应标签组件 (NeoBadge)
+// 🧱 5 大主题自适应标签组件 (NeoBadge) - 彻底杜绝文字折行
 // ==========================================
 
 @Composable
@@ -570,13 +576,17 @@ fun NeoBadge(
                     Modifier.clickable(interactionSource, null) { onClick() }
                 } else Modifier
             )
-            .padding(horizontal = 8.dp, vertical = 3.dp)
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
+            maxLines = 1,
+            softWrap = false,
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Black,
-                letterSpacing = 0.5.sp
+                letterSpacing = 0.5.sp,
+                fontSize = 11.sp
             ),
             color = if (isNeo) textColor else MaterialTheme.colorScheme.primary
         )

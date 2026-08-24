@@ -34,7 +34,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dji.recorder.model.AppThemeStyle
 import com.dji.recorder.model.NoiseReductionMode
+import com.dji.recorder.ui.theme.LocalThemeStyle
 import com.dji.recorder.ui.theme.NeoAcidLime
 import com.dji.recorder.ui.theme.NeoBadge
 import com.dji.recorder.ui.theme.NeoBlack
@@ -42,7 +44,7 @@ import com.dji.recorder.ui.theme.NeoCyberYellow
 import com.dji.recorder.ui.theme.NeoLavender
 
 /**
- * 新粗野风格 (Neo-Brutalism) 降噪质量选择模态面板
+ * 降噪质量选择模态面板 (高对比度、防折行排版)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +55,7 @@ fun NoiseReductionBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val borderColor = MaterialTheme.colorScheme.outline
+    val style = LocalThemeStyle.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -72,8 +75,12 @@ fun NoiseReductionBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(NeoLavender)
-                    .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                    .background(if (style == AppThemeStyle.NEO_BRUTALISM) NeoLavender else MaterialTheme.colorScheme.surfaceVariant)
+                    .border(
+                        if (style == AppThemeStyle.NEO_BRUTALISM) 2.5.dp else 1.dp,
+                        borderColor,
+                        RoundedCornerShape(14.dp)
+                    )
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
@@ -82,14 +89,14 @@ fun NoiseReductionBottomSheet(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(NeoCyberYellow)
-                        .border(2.dp, borderColor, RoundedCornerShape(8.dp)),
+                        .background(if (style == AppThemeStyle.NEO_BRUTALISM) NeoCyberYellow else MaterialTheme.colorScheme.primary)
+                        .border(1.5.dp, borderColor, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Hearing,
                         contentDescription = null,
-                        tint = NeoBlack,
+                        tint = if (style == AppThemeStyle.NEO_BRUTALISM) NeoBlack else Color.White,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -101,13 +108,13 @@ fun NoiseReductionBottomSheet(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp
                         ),
-                        color = NeoBlack
+                        color = if (style == AppThemeStyle.NEO_BRUTALISM) NeoBlack else MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "选择音频降噪滤波算法处理方式",
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = NeoBlack.copy(alpha = 0.75f)
+                        color = if (style == AppThemeStyle.NEO_BRUTALISM) NeoBlack.copy(alpha = 0.75f) else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -173,26 +180,40 @@ fun NeoNoiseOptionCard(
     accentColor: Color,
     onClick: () -> Unit
 ) {
+    val style = LocalThemeStyle.current
     val borderColor = MaterialTheme.colorScheme.outline
+    val isNeo = style == AppThemeStyle.NEO_BRUTALISM
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        // 底层实体硬阴影
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset(x = 3.dp, y = 3.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.Black)
-                .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
-        )
+        // 底层实体硬阴影 (Neo-Brutalism)
+        if (isNeo && isSelected) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = 3.dp, y = 3.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black)
+                    .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
+            )
+        }
 
-        // 卡片表层
+        // 卡片表层 (确保 100% 对比度与清晰文字)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) accentColor.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surface)
-                .border(if (isSelected) 2.5.dp else 2.dp, if (isSelected) borderColor else borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .background(
+                    if (isSelected) {
+                        if (isNeo) accentColor.copy(alpha = 0.35f)
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                    } else MaterialTheme.colorScheme.surfaceVariant
+                )
+                .border(
+                    if (isSelected) (if (isNeo) 2.5.dp else 2.dp) else 1.dp,
+                    if (isSelected) (if (isNeo) borderColor else MaterialTheme.colorScheme.primary)
+                    else borderColor.copy(alpha = 0.35f),
+                    RoundedCornerShape(12.dp)
+                )
                 .clickable { onClick() }
                 .padding(16.dp)
         ) {
@@ -203,34 +224,36 @@ fun NeoNoiseOptionCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(34.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(accentColor)
-                            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isSelected) accentColor else MaterialTheme.colorScheme.surface)
+                            .border(1.5.dp, borderColor, RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = NeoBlack,
-                            modifier = Modifier.size(18.dp)
+                            tint = if (isSelected) NeoBlack else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1
                     )
                 }
 
                 NeoBadge(
                     text = badge,
-                    backgroundColor = accentColor,
+                    backgroundColor = if (isSelected) accentColor else MaterialTheme.colorScheme.surface,
                     textColor = NeoBlack
                 )
             }
@@ -239,7 +262,7 @@ fun NeoNoiseOptionCard(
 
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp, fontWeight = FontWeight.Medium),
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp, fontWeight = FontWeight.Normal),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

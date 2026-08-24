@@ -30,13 +30,21 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dji.recorder.model.AppThemeStyle
+import com.dji.recorder.ui.theme.FlatEmerald
+import com.dji.recorder.ui.theme.FlatIndigo
+import com.dji.recorder.ui.theme.LocalThemeStyle
 import com.dji.recorder.ui.theme.NeoAcidLime
 import com.dji.recorder.ui.theme.NeoBlack
 import com.dji.recorder.ui.theme.NeoCyberYellow
 import com.dji.recorder.ui.theme.NeoHotRed
+import com.dji.recorder.ui.theme.NeuCyan
+import com.dji.recorder.ui.theme.SkeuoAmber
+import com.dji.recorder.ui.theme.SkeuoGold
+import com.dji.recorder.ui.theme.SkeuoLedRed
 
 /**
- * 新粗野风格 (Neo-Brutalism) 实时动态声波可视化组件与工业 VU 电平表
+ * 5 大主题自适应实时动态声波与 VU 电平表组件
  */
 @Composable
 fun WaveformVisualizer(
@@ -45,26 +53,55 @@ fun WaveformVisualizer(
     isRecording: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val style = LocalThemeStyle.current
+    val isNeo = style == AppThemeStyle.NEO_BRUTALISM
     val borderColor = MaterialTheme.colorScheme.outline
 
+    val primaryBarColor = when (style) {
+        AppThemeStyle.NEO_BRUTALISM -> NeoAcidLime
+        AppThemeStyle.FLAT_DESIGN -> FlatEmerald
+        AppThemeStyle.SKEUOMORPHISM -> SkeuoGold
+        AppThemeStyle.NEUMORPHISM -> NeuCyan
+        AppThemeStyle.CLASSIC_STUDIO -> MaterialTheme.colorScheme.primary
+    }
+
+    val warningBarColor = when (style) {
+        AppThemeStyle.NEO_BRUTALISM -> NeoCyberYellow
+        AppThemeStyle.FLAT_DESIGN -> FlatIndigo
+        AppThemeStyle.SKEUOMORPHISM -> SkeuoAmber
+        AppThemeStyle.NEUMORPHISM -> Color(0xFF81D4FA)
+        AppThemeStyle.CLASSIC_STUDIO -> MaterialTheme.colorScheme.secondary
+    }
+
+    val peakBarColor = when (style) {
+        AppThemeStyle.SKEUOMORPHISM -> SkeuoLedRed
+        else -> NeoHotRed
+    }
+
     Box(modifier = modifier.fillMaxWidth()) {
-        // 底层实体硬阴影
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset(x = 4.dp, y = 4.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(Color.Black)
-                .border(2.5.dp, Color.Black, RoundedCornerShape(14.dp))
-        )
+        // 底层实体硬阴影 (仅 Neo 风格)
+        if (isNeo) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = 4.dp, y = 4.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.Black)
+                    .border(2.5.dp, Color.Black, RoundedCornerShape(14.dp))
+            )
+        }
 
         // 表层卡片
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
+                .clip(RoundedCornerShape(if (isNeo) 14.dp else 16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                .border(
+                    if (isNeo) 2.5.dp else 1.dp,
+                    if (isNeo) borderColor else borderColor.copy(alpha = 0.5f),
+                    RoundedCornerShape(if (isNeo) 14.dp else 16.dp)
+                )
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -82,7 +119,7 @@ fun WaveformVisualizer(
                         modifier = Modifier
                             .clip(RoundedCornerShape(4.dp))
                             .background(if (isRecording) NeoHotRed else MaterialTheme.colorScheme.surfaceVariant)
-                            .border(1.5.dp, borderColor, RoundedCornerShape(4.dp))
+                            .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
@@ -109,8 +146,8 @@ fun WaveformVisualizer(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(4.dp))
-                        .background(if (currentDecibels > -3f) NeoHotRed else NeoAcidLime)
-                        .border(1.5.dp, borderColor, RoundedCornerShape(4.dp))
+                        .background(if (currentDecibels > -3f) NeoHotRed else primaryBarColor)
+                        .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
@@ -125,14 +162,14 @@ fun WaveformVisualizer(
                 }
             }
 
-            // 声波条带渲染 (高饱和方块条带 + 黑边勾勒)
+            // 声波条带渲染
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(96.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .border(1.5.dp, borderColor.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
+                    .border(1.dp, borderColor.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 6.dp, vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -156,12 +193,11 @@ fun WaveformVisualizer(
                         val barHeight = (amp.coerceIn(0.06f, 1.0f) * height).coerceAtLeast(6.dp.toPx())
 
                         val barColor = when {
-                            amp > 0.75f -> NeoHotRed
-                            amp > 0.40f -> NeoCyberYellow
-                            else -> NeoAcidLime
+                            amp > 0.75f -> peakBarColor
+                            amp > 0.40f -> warningBarColor
+                            else -> primaryBarColor
                         }
 
-                        // 绘制实体方块条
                         drawRoundRect(
                             color = barColor,
                             topLeft = Offset(x, centerY - (barHeight / 2f)),
@@ -172,7 +208,7 @@ fun WaveformVisualizer(
                 }
             }
 
-            // 底部工业 VU 进度条
+            // 底部 VU 进度条
             val animLevel = remember { Animatable(0f) }
             val targetRatio = if (isRecording) {
                 ((currentDecibels + 60f) / 60f).coerceIn(0f, 1f)
@@ -185,18 +221,18 @@ fun WaveformVisualizer(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(10.dp)
+                    .height(8.dp)
                     .clip(RoundedCornerShape(3.dp))
-                    .background(Color.Black.copy(alpha = 0.25f))
-                    .border(1.5.dp, borderColor, RoundedCornerShape(3.dp))
+                    .background(Color.Black.copy(alpha = 0.2f))
+                    .border(1.dp, borderColor.copy(alpha = 0.5f), RoundedCornerShape(3.dp))
             ) {
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val activeWidth = size.width * animLevel.value
                     drawRect(
                         color = when {
-                            animLevel.value > 0.85f -> NeoHotRed
-                            animLevel.value > 0.65f -> NeoCyberYellow
-                            else -> NeoAcidLime
+                            animLevel.value > 0.85f -> peakBarColor
+                            animLevel.value > 0.65f -> warningBarColor
+                            else -> primaryBarColor
                         },
                         topLeft = Offset.Zero,
                         size = Size(activeWidth, size.height)

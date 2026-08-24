@@ -48,6 +48,7 @@ import com.dji.recorder.ui.theme.ClassicYellow
 import com.dji.recorder.ui.theme.FlatAmber
 import com.dji.recorder.ui.theme.FlatEmerald
 import com.dji.recorder.ui.theme.FlatIndigo
+import com.dji.recorder.ui.theme.LocalThemeStyle
 import com.dji.recorder.ui.theme.NeoAcidLime
 import com.dji.recorder.ui.theme.NeoBadge
 import com.dji.recorder.ui.theme.NeoBlack
@@ -59,7 +60,7 @@ import com.dji.recorder.ui.theme.SkeuoAmber
 import com.dji.recorder.ui.theme.SkeuoGold
 
 /**
- * 独立的【全套视觉主题选择】模态面板 (支持 5 大顶级工业设计主题)
+ * 独立的【全套视觉主题选择】画廊面板 (高对比度、无挤压折行)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +71,7 @@ fun ThemeSelectionSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val borderColor = MaterialTheme.colorScheme.outline
+    val globalStyle = LocalThemeStyle.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -89,8 +91,12 @@ fun ThemeSelectionSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(NeoCyberYellow)
-                    .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                    .background(if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoCyberYellow else MaterialTheme.colorScheme.surfaceVariant)
+                    .border(
+                        if (globalStyle == AppThemeStyle.NEO_BRUTALISM) 2.5.dp else 1.dp,
+                        borderColor,
+                        RoundedCornerShape(14.dp)
+                    )
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -103,13 +109,13 @@ fun ThemeSelectionSheet(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(NeoBlack),
+                            .background(if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoBlack else MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Palette,
                             contentDescription = null,
-                            tint = NeoCyberYellow,
+                            tint = if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoCyberYellow else Color.White,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -120,12 +126,12 @@ fun ThemeSelectionSheet(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.sp
                             ),
-                            color = NeoBlack
+                            color = if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoBlack else MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "切换 5 大顶级工业 UI 视觉风格",
+                            text = "切换 5 大顶级工业 UI 视觉设计风格",
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = NeoBlack.copy(alpha = 0.75f)
+                            color = if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoBlack.copy(alpha = 0.75f) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -134,14 +140,15 @@ fun ThemeSelectionSheet(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(NeoBlack)
+                        .background(if (globalStyle == AppThemeStyle.NEO_BRUTALISM) NeoBlack else MaterialTheme.colorScheme.surfaceVariant)
+                        .border(1.dp, borderColor, RoundedCornerShape(6.dp))
                         .clickable { onDismiss() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        tint = Color.White,
+                        tint = if (globalStyle == AppThemeStyle.NEO_BRUTALISM) Color.White else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -171,7 +178,9 @@ fun ThemeOptionCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val globalStyle = LocalThemeStyle.current
     val borderColor = MaterialTheme.colorScheme.outline
+    val isNeo = globalStyle == AppThemeStyle.NEO_BRUTALISM
 
     val icon: ImageVector = when (style) {
         AppThemeStyle.NEO_BRUTALISM -> Icons.Default.Bolt
@@ -190,8 +199,8 @@ fun ThemeOptionCard(
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        // 底层实体硬阴影
-        if (isSelected) {
+        // 底层实体硬阴影 (仅在 Neo 模式下生效)
+        if (isNeo && isSelected) {
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -202,18 +211,21 @@ fun ThemeOptionCard(
             )
         }
 
-        // 卡片本体
+        // 卡片本体 (保证绝对高对比度)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(
-                    if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                    else MaterialTheme.colorScheme.surfaceVariant
+                    if (isSelected) {
+                        if (isNeo) NeoAcidLime.copy(alpha = 0.25f)
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                    } else MaterialTheme.colorScheme.surfaceVariant
                 )
                 .border(
-                    if (isSelected) 2.5.dp else 1.5.dp,
-                    if (isSelected) borderColor else borderColor.copy(alpha = 0.4f),
+                    if (isSelected) (if (isNeo) 2.5.dp else 2.dp) else 1.dp,
+                    if (isSelected) (if (isNeo) borderColor else MaterialTheme.colorScheme.primary)
+                    else borderColor.copy(alpha = 0.35f),
                     RoundedCornerShape(12.dp)
                 )
                 .clickable { onClick() }
@@ -226,58 +238,59 @@ fun ThemeOptionCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Box(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isSelected) NeoAcidLime else MaterialTheme.colorScheme.surface)
+                            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
                             .border(1.5.dp, borderColor, RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = if (isSelected) NeoBlack else MaterialTheme.colorScheme.primary,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )
                     }
 
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = style.title,
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            NeoBadge(
-                                text = style.badge,
-                                backgroundColor = if (isSelected) NeoCyberYellow else MaterialTheme.colorScheme.surface,
-                                textColor = NeoBlack
-                            )
-                        }
-                    }
+                    Text(
+                        text = style.title,
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1
+                    )
                 }
 
-                if (isSelected) {
-                    Box(
-                        modifier = Modifier
-                            .size(26.dp)
-                            .clip(CircleShape)
-                            .background(NeoAcidLime)
-                            .border(1.5.dp, borderColor, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Selected",
-                            tint = NeoBlack,
-                            modifier = Modifier.size(16.dp)
-                        )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    NeoBadge(
+                        text = style.badge,
+                        backgroundColor = if (isSelected) NeoCyberYellow else MaterialTheme.colorScheme.surface,
+                        textColor = NeoBlack
+                    )
+
+                    if (isSelected) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary)
+                                .border(1.5.dp, borderColor, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Selected",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -286,13 +299,13 @@ fun ThemeOptionCard(
 
             Text(
                 text = style.subtitle,
-                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp),
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp, fontWeight = FontWeight.Normal),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 调色盘预览圆点
+            // 调色盘预览
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -300,7 +313,7 @@ fun ThemeOptionCard(
                 Text(
                     text = "PALETTE:",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Black,
                         fontSize = 10.sp,
                         letterSpacing = 0.5.sp
                     ),
