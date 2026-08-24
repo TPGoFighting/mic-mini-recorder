@@ -21,8 +21,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val themeStyle by viewModel.themeStyle.collectAsState()
             val themeMode by viewModel.themeMode.collectAsState()
-            DjiRecorderTheme(themeMode = themeMode) {
+            DjiRecorderTheme(themeStyle = themeStyle, themeMode = themeMode) {
                 DjiRecorderScreen(viewModel = viewModel)
             }
         }

@@ -128,6 +128,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
     val noiseReductionMode by viewModel.noiseReductionMode.collectAsState()
     val audioConfig by viewModel.audioConfig.collectAsState()
     val activeRoutedDevice by viewModel.activeRoutedDevice.collectAsState()
+    val themeStyle by viewModel.themeStyle.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
     val progress by viewModel.processingProgress.collectAsState()
     val recordings by viewModel.recordingsList.collectAsState()
@@ -157,7 +158,9 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
     if (showSettingsDialog) {
         AudioSettingsDialog(
             currentConfig = audioConfig,
+            currentThemeStyle = themeStyle,
             onSaveConfig = { viewModel.updateAudioConfig(it) },
+            onSelectThemeStyle = { viewModel.setThemeStyle(it) },
             onDismiss = { showSettingsDialog = false }
         )
     }

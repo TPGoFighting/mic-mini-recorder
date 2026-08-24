@@ -87,12 +87,32 @@ data class AudioConfig(
 )
 
 /**
- * 主题模式
+ * 深色/浅色显示模式
  */
 enum class AppThemeMode {
     SYSTEM,
     LIGHT,
     DARK
+}
+
+/**
+ * UI 视觉设计风格主题
+ */
+enum class AppThemeStyle(
+    val title: String,
+    val subtitle: String,
+    val badge: String
+) {
+    NEO_BRUTALISM(
+        title = "新粗野主义 (Neo-Brutalism)",
+        subtitle = "2.5dp 粗黑实体边框 • 4dp 纯黑硬投影 • 酸性撞色 • 机械微动按压动效",
+        badge = "潮流极客"
+    ),
+    CLASSIC_STUDIO(
+        title = "经典演播室 (Classic Studio)",
+        subtitle = "大疆原厂青金配色 • 柔和圆角卡片 • 沉浸低调专业录音棚质感",
+        badge = "原厂极简"
+    )
 }
 
 /**

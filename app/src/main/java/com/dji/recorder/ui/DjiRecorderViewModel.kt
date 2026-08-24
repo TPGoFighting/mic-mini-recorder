@@ -16,6 +16,7 @@ import com.dji.recorder.audio.MediaCodecAudioEncoder
 import com.dji.recorder.audio.StorageHelper
 import com.dji.recorder.audio.WavAudioRecorder
 import com.dji.recorder.model.AppThemeMode
+import com.dji.recorder.model.AppThemeStyle
 import com.dji.recorder.model.AudioConfig
 import com.dji.recorder.model.AudioFormatType
 import com.dji.recorder.model.BluetoothMicDevice
@@ -68,9 +69,11 @@ class DjiRecorderViewModel(application: Application) : AndroidViewModel(applicat
     // 全局音频设置（格式/采样率/比特率/声道）
     val audioConfig: StateFlow<AudioConfig> = settingsManager.config
 
-    // 主题切换（跟随系统 / 深色 / 浅色）
-    private val _themeMode = MutableStateFlow(AppThemeMode.SYSTEM)
-    val themeMode: StateFlow<AppThemeMode> = _themeMode.asStateFlow()
+    // 视觉设计风格（新粗野主义 / 经典演播室）
+    val themeStyle: StateFlow<AppThemeStyle> = settingsManager.themeStyle
+
+    // 深浅显示模式（跟随系统 / 深色 / 浅色）
+    val themeMode: StateFlow<AppThemeMode> = settingsManager.themeMode
 
     // 编码/AI 处理进度
     private val _processingProgress = MutableStateFlow(0f)
@@ -132,13 +135,19 @@ class DjiRecorderViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun setThemeStyle(style: AppThemeStyle) {
+        settingsManager.updateThemeStyle(style)
+        _toastMessage.value = "视觉主题已切换为: ${style.title}"
+    }
+
     fun toggleTheme() {
-        _themeMode.value = when (_themeMode.value) {
+        val nextMode = when (themeMode.value) {
             AppThemeMode.SYSTEM -> AppThemeMode.DARK
             AppThemeMode.DARK -> AppThemeMode.LIGHT
             AppThemeMode.LIGHT -> AppThemeMode.SYSTEM
         }
-        val themeName = when (_themeMode.value) {
+        settingsManager.updateThemeMode(nextMode)
+        val themeName = when (nextMode) {
             AppThemeMode.SYSTEM -> "跟随系统"
             AppThemeMode.DARK -> "深色模式"
             AppThemeMode.LIGHT -> "浅色模式"
