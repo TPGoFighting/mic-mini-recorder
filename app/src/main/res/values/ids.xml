@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="capsule_collapsed_layout" type="id" />
+    <item name="capsule_expanded_layout" type="id" />
+    <item name="tv_capsule_timer" type="id" />
+    <item name="tv_expanded_timer" type="id" />
+</resources>
