@@ -91,11 +91,21 @@ class BluetoothMicManager(private val context: Context) {
     }
 
     /**
-     * 激活外部麦克风输入路由（必须先切换 MODE_IN_COMMUNICATION）
+     * 激活外部麦克风输入路由（USB 声卡走 Hi-Fi 原声通道，蓝牙麦克风走 SCO 通道）
      */
     @SuppressLint("MissingPermission")
     fun activateMicRouting(device: BluetoothMicDevice) {
         try {
+            // 如果是 USB 设备（如 Pocket 3 或 DJI 接收器直插），直接走无损 Hi-Fi 纯净录音通道
+            if (device.type == AudioDeviceInfo.TYPE_USB_DEVICE || device.type == AudioDeviceInfo.TYPE_USB_HEADSET) {
+                Log.i(TAG, "USB Audio Hi-Fi Direct locked: ${device.name}")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    audioManager.setCommunicationDevice(device.rawDeviceInfo)
+                }
+                return
+            }
+
+            // 纯蓝牙直连设备：进入 MODE_IN_COMMUNICATION 与 SCO 链路
             audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val success = audioManager.setCommunicationDevice(device.rawDeviceInfo)
@@ -122,8 +132,10 @@ class BluetoothMicManager(private val context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 audioManager.clearCommunicationDevice()
             }
-            audioManager.stopBluetoothSco()
-            audioManager.isBluetoothScoOn = false
+            if (audioManager.isBluetoothScoOn) {
+                audioManager.stopBluetoothSco()
+                audioManager.isBluetoothScoOn = false
+            }
             audioManager.mode = AudioManager.MODE_NORMAL
             Log.i(TAG, "deactivateMicRouting completed")
         } catch (e: Exception) {
