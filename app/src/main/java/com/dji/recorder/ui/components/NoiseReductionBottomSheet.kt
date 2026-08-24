@@ -1,6 +1,5 @@
 package com.dji.recorder.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,26 +10,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Hearing
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,11 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dji.recorder.model.NoiseReductionMode
-import com.dji.recorder.ui.theme.DjiTeal
-import com.dji.recorder.ui.theme.DjiYellow
+import com.dji.recorder.ui.theme.NeoAcidLime
+import com.dji.recorder.ui.theme.NeoBadge
+import com.dji.recorder.ui.theme.NeoBlack
+import com.dji.recorder.ui.theme.NeoCyberYellow
+import com.dji.recorder.ui.theme.NeoLavender
 
 /**
- * 降噪质量选择模态弹窗（严格对标设计稿）
+ * 新粗野风格 (Neo-Brutalism) 降噪质量选择模态面板
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,144 +52,149 @@ fun NoiseReductionBottomSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val borderColor = MaterialTheme.colorScheme.outline
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 36.dp, top = 8.dp),
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 36.dp, top = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 头部标题区域
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f))
-                    .padding(horizontal = 20.dp, vertical = 18.dp),
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(NeoLavender)
+                    .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface),
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(NeoCyberYellow)
+                        .border(2.dp, borderColor, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Hearing,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(26.dp)
+                        tint = NeoBlack,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
                 Column {
                     Text(
-                        text = "选择降噪质量",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = "NOISE REDUCTION ENGINE",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        ),
+                        color = NeoBlack
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "选择这段录音的处理方式",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "选择音频降噪滤波算法处理方式",
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        color = NeoBlack.copy(alpha = 0.75f)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 选项 1: 高质量 (AI / DPDFNet2 HR)
-            NoiseOptionCard(
+            // 选项 1: 原声直通 (推荐)
+            NeoNoiseOptionCard(
+                title = NoiseReductionMode.OFF.title,
+                badge = NoiseReductionMode.OFF.badge,
+                description = NoiseReductionMode.OFF.description,
+                icon = Icons.Default.VolumeOff,
+                isSelected = currentMode == NoiseReductionMode.OFF,
+                accentColor = NeoAcidLime,
+                onClick = {
+                    onSelectMode(NoiseReductionMode.OFF)
+                    onDismiss()
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 选项 2: 演播室专业降噪 (Audacity / WebRTC APM)
+            NeoNoiseOptionCard(
                 title = NoiseReductionMode.AI_HIGH.title,
                 badge = NoiseReductionMode.AI_HIGH.badge,
                 description = NoiseReductionMode.AI_HIGH.description,
                 icon = Icons.Default.AutoAwesome,
                 isSelected = currentMode == NoiseReductionMode.AI_HIGH,
-                badgeColor = Color(0xFFFFA000),
+                accentColor = NeoCyberYellow,
                 onClick = {
                     onSelectMode(NoiseReductionMode.AI_HIGH)
                     onDismiss()
                 }
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 选项 2: 低质量 (快速 / Android 硬件降噪)
-            NoiseOptionCard(
+            // 选项 3: 系统快速降噪
+            NeoNoiseOptionCard(
                 title = NoiseReductionMode.FAST_LOW.title,
                 badge = NoiseReductionMode.FAST_LOW.badge,
                 description = NoiseReductionMode.FAST_LOW.description,
                 icon = Icons.Default.GraphicEq,
                 isSelected = currentMode == NoiseReductionMode.FAST_LOW,
-                badgeColor = Color(0xFFF57C00),
+                accentColor = NeoLavender,
                 onClick = {
                     onSelectMode(NoiseReductionMode.FAST_LOW)
                     onDismiss()
                 }
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 关闭降噪文字按钮
-            TextButton(
-                onClick = {
-                    onSelectMode(NoiseReductionMode.OFF)
-                    onDismiss()
-                }
-            ) {
-                Text(
-                    text = "关闭降噪",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                    color = if (currentMode == NoiseReductionMode.OFF) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
     }
 }
 
 @Composable
-fun NoiseOptionCard(
+fun NeoNoiseOptionCard(
     title: String,
     badge: String,
     description: String,
     icon: ImageVector,
     isSelected: Boolean,
-    badgeColor: Color,
+    accentColor: Color,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-    }
+    val borderColor = MaterialTheme.colorScheme.outline
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .border(
-                BorderStroke(if (isSelected) 2.dp else 1.dp, if (isSelected) borderColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
-                RoundedCornerShape(20.dp)
-            )
-            .clickable { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
-    ) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // 底层实体硬阴影
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .offset(x = 3.dp, y = 3.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.Black)
+                .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
+        )
+
+        // 卡片表层
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (isSelected) accentColor.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surface)
+                .border(if (isSelected) 2.5.dp else 2.dp, if (isSelected) borderColor else borderColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .clickable { onClick() }
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -202,51 +203,43 @@ fun NoiseOptionCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface),
+                            .size(34.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(accentColor)
+                            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            tint = NeoBlack,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
 
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = badgeColor.copy(alpha = 0.15f)
-                ) {
-                    Text(
-                        text = badge,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
-                        ),
-                        color = badgeColor,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
+                NeoBadge(
+                    text = badge,
+                    backgroundColor = accentColor,
+                    textColor = NeoBlack
+                )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 21.sp),
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp, fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

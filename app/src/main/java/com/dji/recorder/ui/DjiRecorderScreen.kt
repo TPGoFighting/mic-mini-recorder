@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,16 +30,13 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,8 +73,16 @@ import com.dji.recorder.model.RecordingItem
 import com.dji.recorder.ui.components.AudioSettingsDialog
 import com.dji.recorder.ui.components.NoiseReductionBottomSheet
 import com.dji.recorder.ui.components.WaveformVisualizer
-import com.dji.recorder.ui.theme.DjiGreen
-import com.dji.recorder.ui.theme.DjiRed
+import com.dji.recorder.ui.theme.NeoAcidLime
+import com.dji.recorder.ui.theme.NeoBadge
+import com.dji.recorder.ui.theme.NeoBlack
+import com.dji.recorder.ui.theme.NeoButton
+import com.dji.recorder.ui.theme.NeoCard
+import com.dji.recorder.ui.theme.NeoCyberYellow
+import com.dji.recorder.ui.theme.NeoElectricCyan
+import com.dji.recorder.ui.theme.NeoHotRed
+import com.dji.recorder.ui.theme.NeoLavender
+import com.dji.recorder.ui.theme.NeoWhite
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import java.text.SimpleDateFormat
@@ -157,17 +164,17 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                    .padding(horizontal = 18.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 顶栏（品牌名称 + 主题切换 + 设置齿轮）
+                // 顶栏（Neo-Brutalism 粗野风格 Header）
                 TopHeaderBar(
                     themeMode = themeMode,
                     onToggleTheme = { viewModel.toggleTheme() },
                     onOpenSettings = { showSettingsDialog = true }
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // DJI 硬件设备状态卡片
                 DjiHardwareCard(
@@ -182,15 +189,16 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // 录音计时器与转码/AI处理进度
+                // 录音计时器与转码/AI处理进度（复古工业液晶面板）
                 TimerDisplay(
                     durationMs = durationMs,
                     status = status,
                     progress = progress
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
+                // 实时声波可视化
                 WaveformVisualizer(
                     amplitudes = amplitudeHistory,
                     currentDecibels = currentDecibels,
@@ -211,7 +219,7 @@ fun DjiRecorderScreen(viewModel: DjiRecorderViewModel) {
                     modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // 底部操作栏
                 BottomControlBar(
@@ -232,6 +240,8 @@ fun TopHeaderBar(
     onToggleTheme: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
+    val borderColor = MaterialTheme.colorScheme.outline
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -241,37 +251,47 @@ fun TopHeaderBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "App Logo",
+            Box(
                 modifier = Modifier
-                    .size(36.dp)
                     .clip(RoundedCornerShape(8.dp))
-            )
+                    .border(2.dp, borderColor, RoundedCornerShape(8.dp))
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.app_logo),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(38.dp)
+                )
+            }
             Column {
                 Text(
                     text = "DJI MIC STUDIO",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Black,
-                        letterSpacing = 1.5.sp
+                        letterSpacing = 1.2.sp
                     ),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Bluetooth Mic HD Audio System",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "PRO AUDIO ENGINE • v1.0",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconButton(
-                onClick = onToggleTheme,
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // 主题切换按键
+            Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(NeoCyberYellow)
+                    .border(2.dp, borderColor, RoundedCornerShape(10.dp))
+                    .clickable { onToggleTheme() },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = when (themeMode) {
@@ -280,21 +300,26 @@ fun TopHeaderBar(
                         AppThemeMode.SYSTEM -> Icons.Default.Brightness4
                     },
                     contentDescription = "Toggle Theme",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = NeoBlack,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
-            IconButton(
-                onClick = onOpenSettings,
+            // 设置按键
+            Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(NeoAcidLime)
+                    .border(2.dp, borderColor, RoundedCornerShape(10.dp))
+                    .clickable { onOpenSettings() },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Settings",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = NeoBlack,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
@@ -312,17 +337,16 @@ fun DjiHardwareCard(
     onOpenSettings: () -> Unit
 ) {
     val isConnected = deviceName != null
+    val borderColor = MaterialTheme.colorScheme.outline
 
-    Card(
+    NeoCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        borderColor = borderColor,
+        padding = 16.dp
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -333,9 +357,10 @@ fun DjiHardwareCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (isConnected) NeoAcidLime.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant)
+                        .border(2.dp, borderColor, RoundedCornerShape(10.dp))
                         .padding(4.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -353,68 +378,67 @@ fun DjiHardwareCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            text = deviceName ?: "未检测到蓝牙麦克风",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            text = deviceName ?: "未检测到麦克风",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1
                         )
                         Box(
                             modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(if (isConnected) DjiGreen else DjiRed)
+                                .size(10.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(if (isConnected) NeoAcidLime else NeoHotRed)
+                                .border(1.dp, borderColor, RoundedCornerShape(2.dp))
                         )
                     }
 
                     Spacer(modifier = Modifier.height(3.dp))
 
                     Text(
-                        text = if (status == RecorderStatus.RECORDING) activeRoutedDevice else if (isConnected) "强制音频输入锁定 • 48kHz" else "请开启蓝牙配对外部麦克风",
-                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                        color = if (isConnected) DjiGreen else DjiRed
+                        text = if (status == RecorderStatus.RECORDING) activeRoutedDevice else if (isConnected) "⚡ 硬件音频直通锁定 • 48kHz" else "请开启蓝牙配对外部麦克风",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                        color = if (isConnected) (if (status == RecorderStatus.RECORDING) NeoHotRed else NeoAcidLime) else NeoHotRed
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                            modifier = Modifier.clickable { onOpenSettings() }
-                        ) {
-                            val formatText = when (audioConfig.format) {
-                                AudioFormatType.WAV -> "WAV • ${audioConfig.sampleRate / 1000}kHz 无损"
-                                AudioFormatType.MP3 -> "MP3 • ${audioConfig.bitrateKbps}kbps"
-                                AudioFormatType.AAC -> "AAC • ${audioConfig.bitrateKbps}kbps"
-                            }
-                            Text(
-                                text = formatText,
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
+                        val formatText = when (audioConfig.format) {
+                            AudioFormatType.WAV -> "WAV • ${audioConfig.sampleRate / 1000}kHz"
+                            AudioFormatType.MP3 -> "MP3 • ${audioConfig.bitrateKbps}k"
+                            AudioFormatType.AAC -> "AAC • ${audioConfig.bitrateKbps}k"
                         }
+                        NeoBadge(
+                            text = formatText,
+                            backgroundColor = NeoCyberYellow,
+                            textColor = NeoBlack,
+                            onClick = onOpenSettings
+                        )
 
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        ) {
-                            Text(
-                                text = "降噪: ${noiseMode.badge}",
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
+                        NeoBadge(
+                            text = "降噪: ${noiseMode.badge}",
+                            backgroundColor = NeoLavender,
+                            textColor = NeoBlack,
+                            onClick = onOpenSettings
+                        )
                     }
                 }
             }
 
-            IconButton(onClick = onRefresh) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(NeoElectricCyan)
+                    .border(2.dp, borderColor, RoundedCornerShape(8.dp))
+                    .clickable { onRefresh() },
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
                     contentDescription = "Refresh",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = NeoBlack,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
@@ -434,127 +458,118 @@ fun TimerDisplay(
     val millis = (durationMs % 1000) / 10
 
     val timeString = String.format(Locale.getDefault(), "%02d:%02d:%02d.%02d", hours, minutes, seconds, millis)
+    val borderColor = MaterialTheme.colorScheme.outline
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        when (status) {
-            RecorderStatus.PROCESSING_AI -> {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "DPDFNet2 HR 降噪处理中 ${(progress * 100).toInt()}%...",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            RecorderStatus.ENCODING -> {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "音频硬件转码中 ${(progress * 100).toInt()}%...",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            else -> {
-                Text(
-                    text = timeString,
-                    style = MaterialTheme.typography.displayMedium.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = if (status == RecorderStatus.RECORDING) DjiRed else MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomControlBar(
-    status: RecorderStatus,
-    noiseMode: NoiseReductionMode,
-    onOpenNoiseSheet: () -> Unit,
-    onStart: () -> Unit,
-    onStop: () -> Unit
-) {
-    val isRecording = status == RecorderStatus.RECORDING
-    val isReady = status == RecorderStatus.READY || status == RecorderStatus.SAVED
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
-                .clickable(enabled = !isRecording) { onOpenNoiseSheet() }
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = when (noiseMode) {
-                        NoiseReductionMode.AI_HIGH -> Icons.Default.AutoAwesome
-                        NoiseReductionMode.FAST_LOW -> Icons.Default.Hearing
-                        NoiseReductionMode.OFF -> Icons.Default.Mic
-                    },
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = "降噪 • ${noiseMode.badge}",
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // 底层实体硬阴影
         Box(
             modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(
-                    when {
-                        isRecording -> DjiRed
-                        isReady -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.surfaceVariant
-                    }
-                )
-                .clickable(enabled = isReady || isRecording) {
-                    if (isRecording) onStop() else onStart()
-                },
-            contentAlignment = Alignment.Center
+                .matchParentSize()
+                .offset(x = 4.dp, y = 4.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.Black)
+                .border(2.5.dp, Color.Black, RoundedCornerShape(14.dp))
+        )
+
+        // 表层 LCD 仪表卡片
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(2.5.dp, borderColor, RoundedCornerShape(14.dp))
+                .padding(vertical = 16.dp, horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                contentDescription = if (isRecording) "Stop" else "Record",
-                tint = if (isRecording || isReady) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(34.dp)
-            )
+            when (status) {
+                RecorderStatus.PROCESSING_AI -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.5.dp,
+                            color = NeoAcidLime
+                        )
+                        Text(
+                            text = "DEEPFILTERNET 3 ENHANCING...",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .border(1.5.dp, borderColor, RoundedCornerShape(4.dp)),
+                        color = NeoAcidLime,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+                RecorderStatus.ENCODING -> {
+                    Text(
+                        text = "LAME MP3 CONVERTING...",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .border(1.5.dp, borderColor, RoundedCornerShape(4.dp)),
+                        color = NeoCyberYellow,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+                else -> {
+                    Text(
+                        text = timeString,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontSize = 38.sp,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                            letterSpacing = 2.sp
+                        ),
+                        color = if (status == RecorderStatus.RECORDING) NeoHotRed else MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(if (status == RecorderStatus.RECORDING) NeoHotRed else NeoAcidLime)
+                                .border(1.dp, borderColor, RoundedCornerShape(2.dp))
+                        )
+                        Text(
+                            text = if (status == RecorderStatus.RECORDING) "REC LIVE • 48000 HZ" else "STANDBY • READY TO CAPTURE",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -570,6 +585,8 @@ fun RecordingsListSection(
     onDelete: (RecordingItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val borderColor = MaterialTheme.colorScheme.outline
+
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -577,48 +594,63 @@ fun RecordingsListSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "录音列表 (${recordings.size})",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
+                text = "SAVED MASTER TAPES",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.2.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            NeoBadge(
+                text = "${recordings.size} ITEMS",
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                textColor = MaterialTheme.colorScheme.onSurface
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (recordings.isEmpty()) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surface),
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                    .border(2.dp, borderColor.copy(alpha = 0.4f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "暂无录音文件",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "暂无录音文件",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surface),
-                contentPadding = PaddingValues(10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(bottom = 6.dp)
             ) {
-                items(recordings, key = { it.fileName }) { item ->
-                    val isCurrentPlaying = isPlaying && playingFilePath == item.file.absolutePath
-
+                items(recordings, key = { it.file.absolutePath }) { item ->
+                    val isCurrent = isPlaying && playingFilePath == item.file.absolutePath
                     RecordingItemRow(
                         item = item,
-                        isCurrentPlaying = isCurrentPlaying,
-                        playbackProgress = if (isCurrentPlaying) playbackProgress else 0f,
-                        onPlayClick = {
-                            if (isCurrentPlaying) onStop() else onPlay(item)
-                        },
-                        onDeleteClick = { onDelete(item) }
+                        isCurrentPlaying = isCurrent,
+                        playbackProgress = if (isCurrent) playbackProgress else 0f,
+                        onPlay = { onPlay(item) },
+                        onStop = onStop,
+                        onDelete = { onDelete(item) }
                     )
                 }
             }
@@ -631,91 +663,224 @@ fun RecordingItemRow(
     item: RecordingItem,
     isCurrentPlaying: Boolean,
     playbackProgress: Float,
-    onPlayClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onPlay: () -> Unit,
+    onStop: () -> Unit,
+    onDelete: () -> Unit
 ) {
+    val dateStr = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(item.createdAt))
+    val sizeMb = String.format(Locale.getDefault(), "%.1fMB", item.sizeBytes / (1024f * 1024f))
     val durationSec = item.durationMs / 1000
-    val durationText = String.format(Locale.getDefault(), "%02d:%02d", durationSec / 60, durationSec % 60)
-    val sizeMb = String.format(Locale.getDefault(), "%.2f MB", item.sizeBytes / (1024.0 * 1024.0))
-    val dateText = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(item.createdAt))
+    val durationStr = String.format(Locale.getDefault(), "%02d:%02d", durationSec / 60, durationSec % 60)
+    val borderColor = MaterialTheme.colorScheme.outline
 
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = if (isCurrentPlaying) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-    ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // 阴影
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .offset(x = 3.dp, y = 3.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.Black)
+                .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
+        )
+
+        // 卡片
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isCurrentPlaying) NeoAcidLime.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface)
+                .border(2.dp, borderColor, RoundedCornerShape(10.dp))
+                .padding(12.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(
-                    onClick = onPlayClick,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(if (isCurrentPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        imageVector = if (isCurrentPlaying) Icons.Default.Stop else Icons.Default.PlayArrow,
-                        contentDescription = "Play/Stop",
-                        tint = if (isCurrentPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isCurrentPlaying) NeoHotRed else NeoAcidLime)
+                            .border(2.dp, borderColor, RoundedCornerShape(8.dp))
+                            .clickable { if (isCurrentPlaying) onStop() else onPlay() },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = item.fileName,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            modifier = Modifier.weight(1f, fill = false)
+                        Icon(
+                            imageVector = if (isCurrentPlaying) Icons.Default.Stop else Icons.Default.PlayArrow,
+                            contentDescription = if (isCurrentPlaying) "Stop" else "Play",
+                            tint = if (isCurrentPlaying) NeoWhite else NeoBlack,
+                            modifier = Modifier.size(22.dp)
                         )
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = MaterialTheme.colorScheme.surface
-                        ) {
+                    }
+
+                    Column {
+                        Text(
+                            text = item.file.name,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Black),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
-                                text = item.file.extension.uppercase(),
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                text = "$dateStr • $durationStr • $sizeMb",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
-                    Text(
-                        text = "$durationText • $sizeMb • $dateText",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
 
-                IconButton(onClick = onDeleteClick) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    NeoBadge(
+                        text = item.formatType.name,
+                        backgroundColor = NeoCyberYellow,
+                        textColor = NeoBlack
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp))
+                            .clickable { onDelete() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = NeoHotRed,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
 
-            AnimatedVisibility(visible = isCurrentPlaying) {
+            if (isCurrentPlaying) {
+                Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
                     progress = { playbackProgress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .height(3.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .border(1.dp, borderColor, RoundedCornerShape(3.dp)),
+                    color = NeoAcidLime,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomControlBar(
+    status: RecorderStatus,
+    noiseMode: NoiseReductionMode,
+    onOpenNoiseSheet: () -> Unit,
+    onStart: () -> Unit,
+    onStop: () -> Unit
+) {
+    val isRecording = status == RecorderStatus.RECORDING
+    val borderColor = MaterialTheme.colorScheme.outline
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 降噪切换按钮 (NeoButton 风格)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = 3.5.dp, y = 3.5.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black)
+                    .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(NeoLavender)
+                    .border(2.5.dp, borderColor, RoundedCornerShape(12.dp))
+                    .clickable { onOpenNoiseSheet() }
+                    .padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Hearing,
+                    contentDescription = null,
+                    tint = NeoBlack,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "降噪: ${noiseMode.badge}",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 0.5.sp
+                    ),
+                    color = NeoBlack
+                )
+            }
+        }
+
+        // 核心录音触发大按钮 (START / STOP)
+        Box(
+            modifier = Modifier
+                .weight(1.4f)
+                .height(56.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = 3.5.dp, y = 3.5.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black)
+                    .border(2.dp, Color.Black, RoundedCornerShape(12.dp))
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (isRecording) NeoHotRed else NeoAcidLime)
+                    .border(2.5.dp, borderColor, RoundedCornerShape(12.dp))
+                    .clickable { if (isRecording) onStop() else onStart() },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
+                    contentDescription = if (isRecording) "Stop" else "Record",
+                    tint = if (isRecording) NeoWhite else NeoBlack,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isRecording) "STOP RECORD" else "REC NOW",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    ),
+                    color = if (isRecording) NeoWhite else NeoBlack
                 )
             }
         }
@@ -727,38 +892,74 @@ fun PermissionRequiredView(
     modifier: Modifier = Modifier,
     onRequestPermissions: () -> Unit
 ) {
+    val borderColor = MaterialTheme.colorScheme.outline
+
     Column(
-        modifier = modifier.padding(32.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.dji_mic),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = "需要录音与蓝牙权限",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "该应用专为蓝牙外部麦克风（如 DJI Mic）设计，需要获取音频录制和蓝牙连接权限以识别外接麦克风设备。",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 22.sp
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = onRequestPermissions,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
+        NeoCard(
+            modifier = Modifier.fillMaxWidth(),
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            borderColor = borderColor,
+            padding = 24.dp
         ) {
-            Text("授权并继续", fontWeight = FontWeight.Bold)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(NeoCyberYellow)
+                        .border(2.5.dp, borderColor, RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = null,
+                        tint = NeoBlack,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                Text(
+                    text = "PERMISSIONS REQUIRED",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "本应用专为 DJI Mic 蓝牙与 USB 高清声卡定制，需要麦克风录音与附近蓝牙设备扫描权限。",
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                NeoButton(
+                    onClick = onRequestPermissions,
+                    backgroundColor = NeoAcidLime,
+                    borderColor = borderColor
+                ) {
+                    Text(
+                        text = "GRANT PERMISSIONS",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        ),
+                        color = NeoBlack
+                    )
+                }
+            }
         }
     }
 }
